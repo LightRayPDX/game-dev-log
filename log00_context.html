@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log 00 — Context</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Sora:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #0f1117;
+    --surface: #181c27;
+    --surface2: #1e2334;
+    --border: #2a3050;
+    --accent: #5b8cff;
+    --accent2: #3dffc0;
+    --warn: #ffc46b;
+    --muted: #6b7a99;
+    --text: #dde3f5;
+    --text-dim: #8a93b0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    padding: 2rem 1rem 4rem;
+  }
+
+  .page { max-width: 720px; margin: 0 auto; }
+
+  .header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: #5b8cff18;
+    color: var(--accent);
+    border: 1px solid #5b8cff40;
+    border-radius: 4px;
+    padding: 3px 10px;
+    margin-bottom: 1rem;
+  }
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #fff;
+    line-height: 1.2;
+    margin-bottom: 0.4rem;
+  }
+
+  .subtitle { color: var(--text-dim); font-size: 14px; }
+
+  section { margin-bottom: 2rem; }
+
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+    display: block;
+  }
+
+  .collapsible-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+    margin-bottom: 0.75rem;
+  }
+
+  .collapsible-header:hover .section-label { color: var(--text-dim); }
+
+  .collapse-toggle {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 2px 7px;
+    transition: color 0.15s;
+    white-space: nowrap;
+  }
+
+  .collapsible-header:hover .collapse-toggle { color: var(--text-dim); }
+
+  .collapsible-body { display: none; }
+  .collapsible-body.open { display: block; }
+
+  .bullet-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .bullet-list li {
+    display: flex;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--text-dim);
+    align-items: flex-start;
+    line-height: 1.6;
+  }
+
+  .bullet-list li::before {
+    content: '-';
+    color: var(--accent);
+    flex-shrink: 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    margin-top: 2px;
+  }
+
+  .bullet-list li strong { color: var(--text); }
+
+  .qa-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .qa-entry {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .qa-question {
+    padding: 0.9rem 1.25rem;
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    transition: background 0.15s;
+  }
+
+  .qa-question:hover { background: var(--surface2); }
+  .qa-question.open { background: var(--surface2); }
+
+  .q-mark {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    background: #5b8cff18;
+    border: 1px solid #5b8cff35;
+    border-radius: 4px;
+    padding: 2px 7px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .q-text {
+    font-size: 14px;
+    color: var(--text);
+    font-weight: 500;
+    flex: 1;
+    line-height: 1.5;
+  }
+
+  .qa-toggle {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    flex-shrink: 0;
+    margin-top: 2px;
+    transition: transform 0.2s;
+  }
+
+  .qa-question.open .qa-toggle { transform: rotate(90deg); }
+
+  .qa-answer {
+    display: none;
+    padding: 1rem 1.25rem;
+    border-top: 1px solid var(--border);
+    background: #0d1018;
+  }
+
+  .qa-answer.open { display: block; }
+
+  .qa-answer p {
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-bottom: 0.75rem;
+    line-height: 1.6;
+  }
+
+  .qa-answer p:last-child { margin-bottom: 0; }
+
+  .qa-answer strong { color: var(--text); }
+
+  .qa-answer a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .qa-answer a:hover { text-decoration: underline; }
+
+  .qa-bullet-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin: 0.5rem 0 0.75rem 0;
+  }
+
+  .qa-bullet-list li {
+    display: flex;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-dim);
+    align-items: flex-start;
+    line-height: 1.5;
+  }
+
+  .qa-bullet-list li::before {
+    content: '-';
+    color: var(--muted);
+    flex-shrink: 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    margin-top: 2px;
+  }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="tag">Log 00</div>
+    <h1>Context</h1>
+    <p class="subtitle">What I heard, what I built, and why it's structured the way it is.</p>
+  </div>
+
+
+  <!-- WHAT I HEARD — open -->
+  <section>
+    <span class="section-label">What I heard</span>
+    <ul class="bullet-list">
+      <li>You want to build indie games - 2D, not 3D</li>
+      <li>You want to actually learn C++, not work around it with C# or GDScript</li>
+      <li>You've done some C++ already and want to keep building on that, not start over</li>
+      <li>You're interested in Godot eventually, but only in a way that uses real C++ - not GDScript</li>
+      <li>You want the learning to be self-directed, and tied to actual stuff that matters</li>
+      <li>You want enough structure to help build momentum</li>
+    </ul>
+  </section>
+
+  <hr class="divider">
+
+
+  <!-- OVERALL DESIGN — collapsed -->
+  <section>
+    <div class="collapsible-header" onclick="toggleSection('design')">
+      <span class="section-label">Overall design and intention</span>
+      <span class="collapse-toggle" id="design-toggle">show</span>
+    </div>
+    <div class="collapsible-body" id="design">
+      <ul class="bullet-list">
+        <li>The builds get more complex as you go. Where they end up depends on what you're actually interested in building. We'll figure that out as we go.</li>
+        <li>What's coming after the first two: something that actually feels like a game - a start, a lose condition, a score. Then from there it gets into territory you'd actually recognize.</li>
+      </ul>
+    </div>
+  </section>
+
+
+  <!-- WHY RAYLIB — collapsed -->
+  <section>
+    <div class="collapsible-header" onclick="toggleSection('raylib')">
+      <span class="section-label">Why Raylib and not something else</span>
+      <span class="collapse-toggle" id="raylib-toggle">show</span>
+    </div>
+    <div class="collapsible-body" id="raylib">
+      <ul class="bullet-list">
+        <li>You're interested in C++ and 2D games. Raylib is what a lot of actual indie devs use. It's not a learning toy - it's a real tool with a solid community. The alternative paths (Godot with C++, Unity, etc.) either don't use C++ the way you want, or add a lot of overhead before you're writing anything interesting.</li>
+        <li>GDExtension lets you use C++ with Godot, but it adds real setup overhead before you're writing anything interesting. Better to get solid with C++ using Raylib first, then revisit Godot with actual leverage.</li>
+      </ul>
+    </div>
+  </section>
+
+
+  <!-- BUILDS — collapsed -->
+  <section>
+    <div class="collapsible-header" onclick="toggleSection('builds')">
+      <span class="section-label">Builds that get progressively more complex</span>
+      <span class="collapse-toggle" id="builds-toggle">show</span>
+    </div>
+    <div class="collapsible-body" id="builds">
+      <ul class="bullet-list">
+        <li>The builds are sequenced so each one introduces one layer of complexity at a time. Not because the early ones aren't worth doing - because stacking everything at once is a classic way to get stuck in ways that aren't interesting or productive.</li>
+        <li>You'll probably move through the early ones fast. That's fine. The pace picks up, and it's easy to adjust to what you're actually getting through.</li>
+      </ul>
+    </div>
+  </section>
+
+
+  <!-- SYNC-UPS — collapsed -->
+  <section>
+    <div class="collapsible-header" onclick="toggleSection('syncups')">
+      <span class="section-label">Our sync-ups</span>
+      <span class="collapse-toggle" id="syncups-toggle">show</span>
+    </div>
+    <div class="collapsible-body" id="syncups">
+      <ul class="bullet-list">
+        <li>I'm setting aside a few hours a week to see what you're building and figure out what's next. I'm not grading you. I want to see what you made and hear what was interesting or annoying about it.</li>
+        <li>Not a homework review. I'm not looking for completion - I'm looking for engagement, and calibration.</li>
+      </ul>
+    </div>
+  </section>
+
+
+  <!-- STUCK PROTOCOL — collapsed -->
+  <section>
+    <div class="collapsible-header" onclick="toggleSection('stuck')">
+      <span class="section-label">The stuck protocol</span>
+      <span class="collapse-toggle" id="stuck-toggle">show</span>
+    </div>
+    <div class="collapsible-body" id="stuck">
+      <ul class="bullet-list">
+        <li>There's a stuck protocol in the build doc. It's there because the kind of stuck that kills momentum is the silent kind - where the path forward isn't obvious and there's no clear next move. The protocol just gives that a shape.</li>
+        <li>Claude is in there as a tool for understanding errors and concepts, not for generating code. Using it to get code written for you at this stage would be like using a calculator before you understand what multiplication is - you get the answer, but not the skills.</li>
+      </ul>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+
+  <!-- Q&A — open -->
+  <section>
+    <span class="section-label">Questions</span>
+    <div class="qa-list">
+
+      <div class="qa-entry">
+        <div class="qa-question" onclick="toggleQA('q1')">
+          <span class="q-mark">Q</span>
+          <span class="q-text">Why Raylib? It looks like it's only for very simple games. Why not just use Visual Studio, since I've already got it set up and I've been building in it?</span>
+          <span class="qa-toggle">▶</span>
+        </div>
+        <div class="qa-answer" id="q1">
+          <p>Here's what I learned when I looked into it:</p>
+          <p>Visual Studio and Raylib aren't alternatives. Visual Studio is an editor, where you write and compile code. Raylib is a game development library that gives you a game window, input, drawing, and audio. You'd use both together.</p>
+          <p>The real reasons for Raylib:</p>
+          <ul class="qa-bullet-list">
+            <li>Without it, getting a window open and drawing something on screen in raw C++ on Windows means Win32 API or DirectX. That means a lot more setup, and has you starting significantly further from actually writing game logic.</li>
+            <li>Raylib is lightweight and fast (great for 2D, puzzle, and smaller 3D games). It gets you to something moving on screen in about 10 lines, and scales well into commercial game territory.</li>
+            <li>It keeps you directly in the C++ code. You write the systems yourself: collision, state machines, game loops, instead of having an engine like Unreal or GameMaker hide them from you.</li>
+          </ul>
+          <p>On "only for simple games": fair and understandable first impression, since a lot of the examples they show are minimal. What I found with a bit more digging is that there's a pretty broad range of indie games made with Raylib. Take a look at <a href="https://itch.io/games/top-sellers/made-with-raylib" target="_blank">itch.io/games/top-sellers/made-with-raylib</a>.</p>
+          <p>The complexity comes from your code, not from what the library can handle. It's not Unreal, but it's not trying to be, and you've said that Unreal isn't what you're looking for.</p>
+          <p>A lot of developers also build their own custom game engines on top of the Raylib framework, instead of getting tied into a monolithic engine like Unity or Unreal. <a href="https://www.reddit.com/r/raylib/comments/16nvylh/what_is_the_most_advanced_game_created_with_raylib/" target="_blank">This Reddit thread</a> and <a href="https://www.youtube.com/watch?v=d3r6PEXunBc" target="_blank">this video</a> give a decent sense of the range.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</div>
+
+<script>
+  function toggleSection(id) {
+    const body = document.getElementById(id);
+    const toggle = document.getElementById(id + '-toggle');
+    const isOpen = body.classList.contains('open');
+    body.classList.toggle('open', !isOpen);
+    toggle.textContent = isOpen ? 'show' : 'hide';
+  }
+
+  function toggleQA(id) {
+    const answer = document.getElementById(id);
+    const question = answer.previousElementSibling;
+    const isOpen = answer.classList.contains('open');
+    answer.classList.toggle('open', !isOpen);
+    question.classList.toggle('open', !isOpen);
+  }
+</script>
+</body>
+</html>
