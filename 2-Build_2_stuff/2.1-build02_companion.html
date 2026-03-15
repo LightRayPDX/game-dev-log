@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Build 02 — Companion</title>
+<title>Build 02 - Companion</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Sora:wght@400;500;600&display=swap');
 
@@ -396,7 +396,7 @@
 <div class="page">
 
   <div class="header">
-    <div class="tag">Build 02 — Companion</div>
+    <div class="tag">Build 02 - Companion</div>
     <h1>Concepts Behind the Build</h1>
     <p class="subtitle">Reference doc for Build 02. Use it when something isn't clicking, or when you want to understand why something works, not just that it does. Nothing here is required reading before you start.</p>
   </div>
@@ -414,7 +414,7 @@
 
   <!-- AABB -->
   <section id="aabb">
-    <h2>01 — AABB Collision Detection</h2>
+    <h2>01 - AABB Collision Detection</h2>
 
     <div class="concept">
       <div class="concept-header" onclick="toggleConcept(this)">
@@ -426,8 +426,8 @@
         <div class="concept-toggle">▶</div>
       </div>
       <div class="concept-body">
-        <p>AABB stands for <strong>Axis-Aligned Bounding Box</strong>. It just means rectangles that are lined up with the screen axes -- no rotation. Your player and your falling objects are both rectangles that don't rotate, so this is exactly what you need.</p>
-        <p>The plain-language version: <strong>two rectangles overlap if they're not clearly separated in any direction.</strong> If A is not fully to the left of B, and not fully to the right of B, and not fully above B, and not fully below B -- then they must be overlapping.</p>
+        <p>AABB stands for <strong>Axis-Aligned Bounding Box</strong>. It just means rectangles that are lined up with the screen axes - no rotation. Your player and your falling objects are both rectangles that don't rotate, so this is exactly what you need.</p>
+        <p>The plain-language version: <strong>two rectangles overlap if they're not clearly separated in any direction.</strong> If A is not fully to the left of B, and not fully to the right of B, and not fully above B, and not fully below B - then they must be overlapping.</p>
         <p>Raylib gives you <code>CheckCollisionRecs()</code> which handles this for you. But it's worth understanding the logic underneath, because you'll rewrite it yourself eventually.</p>
 
         <div class="drill">
@@ -463,12 +463,12 @@
         <div class="drill">
           <div class="drill-header" onclick="toggleDrill(this)">
             <span class="drill-label why">why</span>
-            <span class="drill-title">Why "axis-aligned" matters -- and what breaks if things rotate</span>
+            <span class="drill-title">Why "axis-aligned" matters - and what breaks if things rotate</span>
             <span class="drill-toggle">▶</span>
           </div>
           <div class="drill-body">
-            <p>AABB only works when rectangles stay parallel to the screen axes. The moment something rotates, the bounding box math breaks -- a rotated rectangle has corners that stick outside its axis-aligned box, giving you false positives.</p>
-            <p>For rotated shapes, you'd need <strong>OBB (Oriented Bounding Box)</strong> collision or <strong>SAT (Separating Axis Theorem)</strong>. Both are more expensive to compute and more complex to implement. For most 2D games with rectangular objects, AABB is the right call -- and even games with rotated sprites often use invisible AABB hitboxes because they feel better to play.</p>
+            <p>AABB only works when rectangles stay parallel to the screen axes. The moment something rotates, the bounding box math breaks - a rotated rectangle has corners that stick outside its axis-aligned box, giving you false positives.</p>
+            <p>For rotated shapes, you'd need <strong>OBB (Oriented Bounding Box)</strong> collision or <strong>SAT (Separating Axis Theorem)</strong>. Both are more expensive to compute and more complex to implement. For most 2D games with rectangular objects, AABB is the right call - and even games with rotated sprites often use invisible AABB hitboxes because they feel better to play.</p>
             <p>Celeste, notably, uses very forgiving hitboxes. The player's actual collision rectangle is smaller than the visible sprite. That's a deliberate feel decision, not a technical limitation.</p>
           </div>
         </div>
@@ -490,7 +490,7 @@
         <span class="kw">break</span>;
     }
 }</code></pre>
-            <p>The <code>break</code> after detecting a hit exits the loop early -- no point checking remaining objects if the game is already over.</p>
+            <p>The <code>break</code> after detecting a hit exits the loop early - no point checking remaining objects if the game is already over.</p>
             <div class="callout tip"><strong>Tip:</strong> If collisions feel unfair or too tight, shrink the player's collision rectangle slightly from its visual size. This is called a "forgiveness hitbox" and it's used in almost every action game.</div>
           </div>
         </div>
@@ -501,7 +501,7 @@
 
   <!-- VECTOR -->
   <section id="vector">
-    <h2>02 — std::vector and the Erase-Remove Pattern</h2>
+    <h2>02 - std::vector and the Erase-Remove Pattern</h2>
 
     <div class="concept">
       <div class="concept-header" onclick="toggleConcept(this)">
@@ -514,7 +514,7 @@
       </div>
       <div class="concept-body">
         <p>You've used <code>std::vector</code> before. In this build it's doing something slightly more interesting: you're <strong>adding objects during gameplay</strong> (spawning) and <strong>removing them</strong> when they leave the screen. That "remove while iterating" part is where most people hit a wall.</p>
-        <p>The problem: if you loop through a vector and delete items as you go, you mess up the loop's index tracking. The standard solution is the <strong>erase-remove idiom</strong> -- a two-step pattern that C++ programmers use constantly.</p>
+        <p>The problem: if you loop through a vector and delete items as you go, you mess up the loop's index tracking. The standard solution is the <strong>erase-remove idiom</strong> - a two-step pattern that C++ programmers use constantly.</p>
 
         <div class="drill">
           <div class="drill-header" onclick="toggleDrill(this)">
@@ -523,7 +523,7 @@
             <span class="drill-toggle">▶</span>
           </div>
           <div class="drill-body">
-            <p>Imagine a vector <code>[A, B, C, D]</code> and you're looping with index <code>i</code>. You're at index 1 (B) and you erase it. The vector becomes <code>[A, C, D]</code> and the loop advances to index 2 -- but C is now at index 1. You just skipped C entirely.</p>
+            <p>Imagine a vector <code>[A, B, C, D]</code> and you're looping with index <code>i</code>. You're at index 1 (B) and you erase it. The vector becomes <code>[A, C, D]</code> and the loop advances to index 2 - but C is now at index 1. You just skipped C entirely.</p>
             <p>This causes subtle bugs: objects that should be removed aren't, objects get skipped, iterators become invalid and crash the program. It's one of the most common beginner C++ mistakes.</p>
           </div>
         </div>
@@ -545,7 +545,7 @@ fallingObjects.<span class="fn">erase</span>(
     fallingObjects.<span class="fn">end</span>()
 );</code></pre>
             <p><code>remove_if</code> moves all the "keep" items to the front of the vector and returns an iterator pointing to where the "remove" items start. Then <code>erase</code> cuts everything from that point to the end.</p>
-            <div class="callout note"><strong>Note:</strong> <code>std::remove_if</code> is in <code>&lt;algorithm&gt;</code> -- make sure that's included at the top of your file.</div>
+            <div class="callout note"><strong>Note:</strong> <code>std::remove_if</code> is in <code>&lt;algorithm&gt;</code> - make sure that's included at the top of your file.</div>
           </div>
         </div>
 
@@ -556,9 +556,9 @@ fallingObjects.<span class="fn">erase</span>(
             <span class="drill-toggle">▶</span>
           </div>
           <div class="drill-body">
-            <p><code>std::remove_if</code> doesn't actually delete anything -- it <strong>rearranges</strong> the vector in place. It uses a two-pointer technique: one pointer scans forward looking for items to keep, another tracks where the next "keep" item should be placed. Items marked for removal get overwritten by later "keep" items.</p>
-            <p>After it runs, the vector looks like <code>[keep, keep, keep, junk, junk]</code> -- the "junk" items are still technically in memory, just overwritten with garbage values. The iterator it returns points to the start of the junk zone. <code>erase()</code> then trims the vector to remove that zone.</p>
-            <p>This two-step design exists because <code>remove_if</code> is a general algorithm that works on any range, not just vectors -- it can't resize things itself. The separation of "rearrange" and "resize" is a deliberate design decision in the C++ standard library.</p>
+            <p><code>std::remove_if</code> doesn't actually delete anything - it <strong>rearranges</strong> the vector in place. It uses a two-pointer technique: one pointer scans forward looking for items to keep, another tracks where the next "keep" item should be placed. Items marked for removal get overwritten by later "keep" items.</p>
+            <p>After it runs, the vector looks like <code>[keep, keep, keep, junk, junk]</code> - the "junk" items are still technically in memory, just overwritten with garbage values. The iterator it returns points to the start of the junk zone. <code>erase()</code> then trims the vector to remove that zone.</p>
+            <p>This two-step design exists because <code>remove_if</code> is a general algorithm that works on any range, not just vectors - it can't resize things itself. The separation of "rearrange" and "resize" is a deliberate design decision in the C++ standard library.</p>
           </div>
         </div>
       </div>
@@ -568,7 +568,7 @@ fallingObjects.<span class="fn">erase</span>(
 
   <!-- STATE MACHINE -->
   <section id="statemachine">
-    <h2>03 — State Machines</h2>
+    <h2>03 - State Machines</h2>
 
     <div class="concept">
       <div class="concept-header" onclick="toggleConcept(this)">
@@ -591,8 +591,8 @@ fallingObjects.<span class="fn">erase</span>(
           </div>
           <div class="drill-body">
             <p>You could write <code>bool isGameOver = false</code> and it would work for this build. So why use an enum?</p>
-            <p>The moment you add a third state -- a title screen, a pause menu, a win condition -- a bool breaks. You'd need two bools, then three, and the combinations become hard to reason about. <code>bool isGameOver && !isPaused && !isOnTitleScreen</code> is a bug waiting to happen.</p>
-            <p>An enum scales cleanly. Adding a <code>Paused</code> state is one line. The compiler will also warn you if you forget to handle a state in a switch statement -- a bool gives you no such help.</p>
+            <p>The moment you add a third state - a title screen, a pause menu, a win condition - a bool breaks. You'd need two bools, then three, and the combinations become hard to reason about. <code>bool isGameOver && !isPaused && !isOnTitleScreen</code> is a bug waiting to happen.</p>
+            <p>An enum scales cleanly. Adding a <code>Paused</code> state is one line. The compiler will also warn you if you forget to handle a state in a switch statement - a bool gives you no such help.</p>
             <pre><code><span class="kw">enum class</span> <span class="type">GameState</span> { TitleScreen, Playing, Paused, GameOver, Victory };
 <span class="comment">// Adding states later costs almost nothing</span></code></pre>
           </div>
@@ -601,7 +601,7 @@ fallingObjects.<span class="fn">erase</span>(
         <div class="drill">
           <div class="drill-header" onclick="toggleDrill(this)">
             <span class="drill-label math">deeper</span>
-            <span class="drill-title">Finite State Machines — the formal concept</span>
+            <span class="drill-title">Finite State Machines - the formal concept</span>
             <span class="drill-toggle">▶</span>
           </div>
           <div class="drill-body">
@@ -644,7 +644,7 @@ fallingObjects.<span class="fn">erase</span>(
 
   <!-- STRUCTS -->
   <section id="structs">
-    <h2>04 — Structs for Game Objects</h2>
+    <h2>04 - Structs for Game Objects</h2>
 
     <div class="concept">
       <div class="concept-header" onclick="toggleConcept(this)">
@@ -669,12 +669,12 @@ fallingObjects.<span class="fn">erase</span>(
         <div class="drill">
           <div class="drill-header" onclick="toggleDrill(this)">
             <span class="drill-label why">why</span>
-            <span class="drill-title">Structs vs classes -- what's the actual difference</span>
+            <span class="drill-title">Structs vs classes - what's the actual difference</span>
             <span class="drill-toggle">▶</span>
           </div>
           <div class="drill-body">
             <p>In C++, <code>struct</code> and <code>class</code> are almost identical. The only real difference is default access: struct members are <code>public</code> by default, class members are <code>private</code> by default.</p>
-            <p>Convention in game dev (and C++ generally): use <code>struct</code> for simple data bundles with no complex behavior, use <code>class</code> when you want to encapsulate data with methods and access control. For game objects at this stage, structs are the right call -- they're simple, readable, and get out of the way.</p>
+            <p>Convention in game dev (and C++ generally): use <code>struct</code> for simple data bundles with no complex behavior, use <code>class</code> when you want to encapsulate data with methods and access control. For game objects at this stage, structs are the right call - they're simple, readable, and get out of the way.</p>
             <p>As your games grow, you'll likely migrate toward classes with methods like <code>update()</code> and <code>draw()</code> on each object. That's the beginning of object-oriented game architecture. Build 02 is a natural stepping stone toward that.</p>
           </div>
         </div>
@@ -685,7 +685,7 @@ fallingObjects.<span class="fn">erase</span>(
 
   <!-- SPAWNING -->
   <section id="spawning">
-    <h2>05 — Spawning on a Timer</h2>
+    <h2>05 - Spawning on a Timer</h2>
 
     <div class="concept">
       <div class="concept-header" onclick="toggleConcept(this)">
@@ -697,7 +697,7 @@ fallingObjects.<span class="fn">erase</span>(
         <div class="concept-toggle">▶</div>
       </div>
       <div class="concept-body">
-        <p>You can't use <code>sleep()</code> or similar to wait between spawns -- that would pause the whole game. Instead, you <strong>accumulate delta time</strong> each frame and trigger a spawn once you've accumulated enough.</p>
+        <p>You can't use <code>sleep()</code> or similar to wait between spawns - that would pause the whole game. Instead, you <strong>accumulate delta time</strong> each frame and trigger a spawn once you've accumulated enough.</p>
         <pre><code><span class="type">float</span> spawnTimer = <span class="num">0.0f</span>;
 <span class="type">float</span> spawnInterval = <span class="num">1.5f</span>; <span class="comment">// seconds between spawns</span>
 
@@ -733,41 +733,20 @@ spawnInterval = <span class="fn">fmax</span>(<span class="num">0.3f</span>, spaw
 
   <!-- RESOURCES -->
   <section id="resources">
-    <h2>06 — Further Reading</h2>
+    <h2>06 - Going further</h2>
     <div class="resource-row">
-      <a class="resource" href="https://www.learncpp.com/cpp-tutorial/an-introduction-to-stdvector/" target="_blank">
-        <div class="r-icon">📖</div>
-        <div class="r-body">
-          <strong>learncpp.com — std::vector</strong>
-          <span>Thorough coverage of vector operations including the erase-remove idiom</span>
-        </div>
-      </a>
-      <a class="resource" href="https://www.learncpp.com/cpp-tutorial/enum-classes/" target="_blank">
-        <div class="r-icon">📖</div>
-        <div class="r-body">
-          <strong>learncpp.com — enum classes</strong>
-          <span>Why enum class over plain enum, and how to use them effectively</span>
-        </div>
-      </a>
-      <a class="resource" href="https://www.learncpp.com/cpp-tutorial/introduction-to-structs-members-and-member-selection/" target="_blank">
-        <div class="r-icon">📖</div>
-        <div class="r-body">
-          <strong>learncpp.com — structs</strong>
-          <span>Covers struct basics and when to use them vs classes</span>
-        </div>
-      </a>
       <a class="resource" href="https://gamemath.com" target="_blank">
         <div class="r-icon">📐</div>
         <div class="r-body">
           <strong>3D Math Primer for Graphics and Game Development</strong>
-          <span>Free online. Excellent on collision geometry when you're ready to go deeper than AABB</span>
+          <span>Free online. Excellent on collision geometry when you're ready to go deeper than AABB.</span>
         </div>
       </a>
       <a class="resource" href="https://www.raylib.com/examples.html" target="_blank">
         <div class="r-icon">▶</div>
         <div class="r-body">
           <strong>Raylib Examples</strong>
-          <span>Browse the collision detection and shapes examples -- readable source code for each</span>
+          <span>Browse the collision detection and shapes examples - readable source code for each.</span>
         </div>
       </a>
     </div>
