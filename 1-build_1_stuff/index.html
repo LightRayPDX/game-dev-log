@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>game-dev-log</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Sora:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #0f1117;
+    --surface: #181c27;
+    --surface2: #1e2334;
+    --border: #2a3050;
+    --accent: #5b8cff;
+    --accent2: #3dffc0;
+    --muted: #6b7a99;
+    --text: #dde3f5;
+    --text-dim: #8a93b0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    padding: 2rem 1rem 4rem;
+  }
+
+  .page { max-width: 680px; margin: 0 auto; }
+
+  .header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .wordmark {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 0.4rem;
+  }
+
+  .tagline {
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  h2 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+  }
+
+  section { margin-bottom: 2.5rem; }
+
+  .build-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .build {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .build-header {
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .build-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 8px;
+    flex-shrink: 0;
+    margin-top: 3px;
+  }
+
+  .build-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 2px;
+  }
+
+  .build-desc {
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  .build-links {
+    border-top: 1px solid var(--border);
+    padding: 0.6rem 1.25rem;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    background: var(--surface2);
+  }
+
+  .build-link {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    text-decoration: none;
+    letter-spacing: 0.04em;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .build-link:hover { color: #fff; }
+
+  .build-link.companion { color: var(--accent2); }
+  .build-link.companion:hover { color: #fff; }
+
+  .link-arrow {
+    font-size: 10px;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="wordmark">game-dev-log</div>
+    <div class="tagline">A build-by-build record of learning C++ game development with Raylib.</div>
+  </div>
+
+  <section>
+    <h2>Context</h2>
+    <div class="build-list">
+
+      <div class="build">
+        <div class="build-header">
+          <div class="build-num">Log 00</div>
+          <div>
+            <div class="build-title">Context</div>
+            <div class="build-desc">What this is, why it's structured the way it is, and questions answered along the way.</div>
+          </div>
+        </div>
+        <div class="build-links">
+          <a class="build-link" href="log00_context.html">
+            <span class="link-arrow">→</span> Log 00
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <h2>Builds</h2>
+    <div class="build-list">
+
+      <div class="build">
+        <div class="build-header">
+          <div class="build-num">Build 01</div>
+          <div>
+            <div class="build-title">Something Moves</div>
+            <div class="build-desc">Game loop, delta time, bouncing ball, wall collision.</div>
+          </div>
+        </div>
+        <div class="build-links">
+          <a class="build-link" href="1-Build_1_stuff/1.0-build01_something_moves.html">
+            <span class="link-arrow">→</span> Build doc
+          </a>
+        </div>
+      </div>
+
+      <div class="build">
+        <div class="build-header">
+          <div class="build-num">Build 02</div>
+          <div>
+            <div class="build-title">Something Interactive</div>
+            <div class="build-desc">Player input, falling objects, collision, state machine, score.</div>
+          </div>
+        </div>
+        <div class="build-links">
+          <a class="build-link" href="2-Build_2_stuff/2.0-build02_something_interactive.html">
+            <span class="link-arrow">→</span> Build doc
+          </a>
+          <a class="build-link companion" href="2-Build_2_stuff/2.1-build02_companion.html">
+            <span class="link-arrow">→</span> Companion
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</div>
+</body>
+</html>
