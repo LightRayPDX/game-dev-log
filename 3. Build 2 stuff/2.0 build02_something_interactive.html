@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Build 02 — Something Interactive</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Sora:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #0f1117;
+    --surface: #181c27;
+    --surface2: #1e2334;
+    --border: #2a3050;
+    --accent: #5b8cff;
+    --accent2: #3dffc0;
+    --warn: #ffc46b;
+    --muted: #6b7a99;
+    --text: #dde3f5;
+    --text-dim: #8a93b0;
+    --success: #3dffc0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    padding: 2rem 1rem 4rem;
+  }
+
+  .page { max-width: 720px; margin: 0 auto; }
+
+  .header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: #5b8cff18;
+    color: var(--accent);
+    border: 1px solid #5b8cff40;
+    border-radius: 4px;
+    padding: 3px 10px;
+    margin-bottom: 1rem;
+  }
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #fff;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+  }
+
+  .subtitle {
+    color: var(--text-dim);
+    font-size: 14px;
+  }
+
+  .meta-row {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .meta-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent2);
+    flex-shrink: 0;
+  }
+
+  .meta-dot.warn { background: var(--warn); }
+
+  h2 {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    margin-bottom: 0.75rem;
+  }
+
+  section { margin-bottom: 2.5rem; }
+
+  .callout {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+  }
+
+  .callout.accent {
+    border-color: #5b8cff30;
+    background: #5b8cff08;
+  }
+
+  .callout.warn {
+    border-color: #ffc46b35;
+    background: #ffc46b08;
+  }
+
+  .callout.success {
+    border-color: #3dffc030;
+    background: #3dffc008;
+  }
+
+  .callout p, .callout li {
+    color: var(--text-dim);
+    font-size: 14px;
+  }
+
+  .callout strong { color: var(--text); }
+
+  .callout-title {
+    font-weight: 600;
+    font-size: 13px;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .callout-title .icon {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+
+  .icon-blue { background: #5b8cff25; color: var(--accent); }
+  .icon-warn { background: #ffc46b25; color: var(--warn); }
+  .icon-green { background: #3dffc025; color: var(--accent2); }
+
+  .carries-forward {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .carry-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 14px;
+  }
+
+  .carry-check {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent2);
+    background: #3dffc015;
+    border: 1px solid #3dffc030;
+    border-radius: 4px;
+    padding: 2px 7px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .carry-item p { color: var(--text-dim); font-size: 14px; }
+  .carry-item strong { color: var(--text); }
+
+  .new-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--warn);
+    background: #ffc46b15;
+    border: 1px solid #ffc46b30;
+    border-radius: 4px;
+    padding: 2px 7px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .step-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+  }
+
+  .step {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .step-num {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .step-body { flex: 1; }
+
+  .step-body strong {
+    display: block;
+    font-size: 14px;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+
+  .step-body p, .step-body span {
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  .step-body a { color: var(--accent); text-decoration: none; }
+  .step-body a:hover { text-decoration: underline; }
+
+  .step-badge {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 3px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
+  .badge-new {
+    background: #ffc46b18;
+    color: var(--warn);
+    border: 1px solid #ffc46b35;
+  }
+
+  .badge-carry {
+    background: #3dffc015;
+    color: var(--accent2);
+    border: 1px solid #3dffc030;
+  }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    background: #ffffff10;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 6px;
+    color: var(--accent2);
+  }
+
+  pre {
+    background: #11141e;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem;
+    overflow-x: auto;
+    margin-top: 0.75rem;
+  }
+
+  pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.7;
+  }
+
+  .comment { color: #4a5470; }
+  .kw { color: #8ba4ff; }
+  .fn { color: #3dffc0; }
+  .str { color: #ffd080; }
+  .num { color: #ff9f7a; }
+  .type { color: #c8a6ff; }
+
+  .concept-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+  }
+
+  .concept-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+  }
+
+  .concept-card .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .concept-card .label.new { color: var(--warn); }
+
+  .concept-card p {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+
+  .check-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .check-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--text-dim);
+  }
+
+  .check-box {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    border: 1.5px solid var(--border);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 2rem 0;
+  }
+
+  .next-tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    background: #3dffc015;
+    color: var(--accent2);
+    border: 1px solid #3dffc030;
+    border-radius: 4px;
+    padding: 2px 8px;
+    margin-bottom: 0.5rem;
+  }
+
+  .stuck-protocol {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .stuck-step {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.9rem 1rem;
+  }
+
+  .stuck-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--warn);
+    background: #ffc46b18;
+    border-radius: 4px;
+    padding: 2px 7px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    white-space: nowrap;
+  }
+
+  .stuck-step .body strong {
+    font-size: 14px;
+    color: var(--text);
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .stuck-step .body p { font-size: 13px; color: var(--text-dim); }
+
+  .resource-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-top: 0.5rem;
+  }
+
+  .resource {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 0.75rem 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    text-decoration: none;
+  }
+
+  .resource:hover { border-color: #5b8cff50; }
+
+  .resource .r-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    background: #5b8cff15;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 14px;
+  }
+
+  .resource .r-body strong {
+    display: block;
+    font-size: 14px;
+    color: var(--accent);
+  }
+
+  .resource .r-body span { font-size: 12px; color: var(--text-dim); }
+
+  .state-diagram {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-top: 0.75rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .state-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text);
+  }
+
+  .state-box.active { border-color: #5b8cff50; color: var(--accent); }
+
+  .state-arrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    padding: 0 0.25rem;
+  }
+
+  .state-label {
+    font-size: 11px;
+    color: var(--text-dim);
+    display: block;
+    text-align: center;
+    margin-top: 3px;
+  }
+
+  .state-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="tag">Build 02</div>
+    <h1>Something Interactive</h1>
+    <p class="subtitle">Player input. Falling objects. Collision. A score. A way to lose. A way to restart. First thing that actually feels like a game.</p>
+    <div class="meta-row">
+      <div class="meta-item"><div class="meta-dot"></div>6–10 hours</div>
+      <div class="meta-item"><div class="meta-dot"></div>C++ + Raylib</div>
+      <div class="meta-item"><div class="meta-dot warn"></div>Game state is the main new concept to wrestle with</div>
+    </div>
+  </div>
+
+
+  <section>
+    <h2>What carries forward from Build 01</h2>
+    <div class="callout accent" style="margin-bottom: 1rem;">
+      <div class="callout-title"><div class="icon icon-blue">→</div> You already have the foundation</div>
+      <p>The game loop you wrote in Build 01 is the core of this project. <strong>Everything new here gets layered on top of it</strong> -- you're not starting over, you're extending what you built.</p>
+    </div>
+    <div class="carries-forward">
+      <div class="carry-item">
+        <div class="carry-check">carries</div>
+        <p><strong>The game loop</strong> -- <code>while(!WindowShouldClose())</code>, update, draw, repeat. Identical structure.</p>
+      </div>
+      <div class="carry-item">
+        <div class="carry-check">carries</div>
+        <p><strong>Delta time</strong> -- <code>GetFrameTime()</code> keeps movement frame-rate independent. Same as before, more objects now.</p>
+      </div>
+      <div class="carry-item">
+        <div class="carry-check">carries</div>
+        <p><strong>Position + velocity variables</strong> -- you're adding more of them, but the pattern is the same.</p>
+      </div>
+      <div class="carry-item">
+        <div class="carry-check">carries</div>
+        <p><strong>Wall collision logic</strong> -- boundary checking you already wrote. This time the boundary is the bottom of the screen, not a bounce point.</p>
+      </div>
+    </div>
+  </section>
+
+
+  <section>
+    <h2>What you're building</h2>
+    <p style="color:var(--text-dim); font-size:14px; margin-bottom:1rem;">A player-controlled rectangle at the bottom of the screen. Objects fall from the top at random positions. Get hit, you lose. Score counts how long you've survived (or how many you've dodged). Game over screen. Press a key to restart.</p>
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="label">Keyboard input</div>
+        <p>reading which keys are held down and moving the player accordingly each frame</p>
+      </div>
+      <div class="concept-card">
+        <div class="label new">new — AABB collision</div>
+        <p>axis-aligned bounding box -- rectangle vs rectangle overlap detection. The simplest collision math that actually works</p>
+      </div>
+      <div class="concept-card">
+        <div class="label new">new — std::vector</div>
+        <p>a dynamic list of falling objects. Spawn them, move them, remove them when they leave the screen</p>
+      </div>
+      <div class="concept-card">
+        <div class="label new">new — game state</div>
+        <p>your program needs to know whether it's in "playing" mode or "game over" mode and behave differently in each</p>
+      </div>
+    </div>
+  </section>
+
+
+  <section>
+    <h2>The state machine -- worth understanding before you build</h2>
+    <p style="color:var(--text-dim); font-size:14px; margin-bottom: 0.75rem;">This is the main new concept. Every game you'll ever write has one -- it's just a way of asking "what mode is the game in right now, and what should happen in that mode."</p>
+
+    <div class="state-diagram">
+      <div class="state-col">
+        <div class="state-box active">PLAYING</div>
+        <span class="state-label">move player<br>spawn objects<br>check collisions<br>update score</span>
+      </div>
+      <div class="state-col" style="padding-bottom: 1.4rem;">
+        <div style="display:flex; align-items:center; gap:4px;">
+          <div class="state-arrow">─── hit ──→</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:4px; margin-top:0.5rem;">
+          <div class="state-arrow">←─ restart ─</div>
+        </div>
+      </div>
+      <div class="state-col">
+        <div class="state-box">GAME OVER</div>
+        <span class="state-label">show score<br>wait for input<br>reset everything</span>
+      </div>
+    </div>
+
+    <pre style="margin-top:1rem;"><code><span class="kw">enum class</span> <span class="type">GameState</span> { Playing, GameOver };
+<span class="type">GameState</span> state = <span class="type">GameState</span>::Playing;
+
+<span class="comment">// In your game loop:</span>
+<span class="kw">if</span> (state == <span class="type">GameState</span>::Playing) {
+    <span class="comment">// update player, objects, score, check collisions</span>
+} <span class="kw">else if</span> (state == <span class="type">GameState</span>::GameOver) {
+    <span class="comment">// draw "game over", wait for restart key</span>
+}</code></pre>
+  </section>
+
+
+  <section>
+    <h2>Build it</h2>
+    <div class="step-list">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <strong>Start from your Build 01 skeleton <span class="step-badge badge-carry">carry</span></strong>
+          <span>Copy it. Strip out the bouncing ball. You want a clean game loop -- window, delta time, begin/end drawing. Your starting point is already better than zero.</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <strong>Add a player rectangle <span class="step-badge badge-carry">carry</span></strong>
+          <span>Position at the bottom center. Read <code>IsKeyDown(KEY_LEFT)</code> and <code>IsKeyDown(KEY_RIGHT)</code> each frame and update x position. Clamp it so it can't leave the screen. You've done position + boundary logic before.</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <strong>Spawn one falling object <span class="step-badge badge-new">new</span></strong>
+          <span>A single rectangle with a random x position at the top, falling at a fixed speed. Get it falling and disappearing when it hits the bottom before adding more.</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <strong>Make it a <code>std::vector</code> of objects <span class="step-badge badge-new">new</span></strong>
+          <span>Move your falling object into a struct. Create a <code>std::vector</code> of them. Spawn a new one on a timer. Loop through the vector to update and draw each one. Remove objects that exit the screen bottom using the erase-remove pattern -- look this up, it's a standard C++ idiom worth knowing.</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <strong>Add AABB collision detection <span class="step-badge badge-new">new</span></strong>
+          <span>For each falling object, check if its rectangle overlaps the player rectangle. Raylib has <code>CheckCollisionRecs()</code> -- use it. When a hit is detected, switch game state to <code>GameOver</code>.</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-body">
+          <strong>Add game state + score <span class="step-badge badge-new">new</span></strong>
+          <span>Implement the enum from above. In <code>Playing</code>: increment a score counter each frame (or each object dodged). In <code>GameOver</code>: draw the score and "press R to restart." On restart, clear the vector, reset the score, reset player position, switch state back to <code>Playing</code>.</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">7</div>
+        <div class="step-body">
+          <strong>Mess with it</strong>
+          <span>Increase spawn rate over time. Vary falling speed. Make the player faster or slower. Add a high score that persists across rounds. None of this is required -- but at least one of these will bother you enough to try.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <section>
+    <h2>Resources</h2>
+    <div class="resource-row">
+      <a class="resource" href="https://www.raylib.com/cheatsheet/cheatsheet.html" target="_blank">
+        <div class="r-icon">📋</div>
+        <div class="r-body">
+          <strong>Raylib Cheatsheet</strong>
+          <span>Same as before. Look up CheckCollisionRecs, IsKeyDown, DrawText, DrawRectangleRec.</span>
+        </div>
+      </a>
+      <a class="resource" href="https://www.learncpp.com/cpp-tutorial/an-introduction-to-stdvector/" target="_blank">
+        <div class="r-icon">📖</div>
+        <div class="r-body">
+          <strong>learncpp.com — std::vector</strong>
+          <span>If vectors are shaky, read this before step 4. The erase-remove pattern is in here too.</span>
+        </div>
+      </a>
+      <a class="resource" href="https://www.learncpp.com/cpp-tutorial/enum-classes/" target="_blank">
+        <div class="r-icon">📖</div>
+        <div class="r-body">
+          <strong>learncpp.com — enum classes</strong>
+          <span>Quick read. Useful before you implement game state.</span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+
+  <section>
+    <h2>When you get stuck</h2>
+    <p style="font-size:13px; color:var(--text-dim); margin-bottom:0.9rem;">Use this in order.</p>
+    <div class="stuck-protocol">
+      <div class="stuck-step">
+        <div class="stuck-num">20 min</div>
+        <div class="body">
+          <strong>Work it yourself</strong>
+          <p>Read the error. Find the line. Check the cheatsheet or learncpp. This is where the actual skill gets built.</p>
+        </div>
+      </div>
+      <div class="stuck-step">
+        <div class="stuck-num">rubber duck</div>
+        <div class="body">
+          <strong>Explain it out loud</strong>
+          <p>Say or write the problem. "My objects aren't being removed because..." More often than not this is enough.</p>
+        </div>
+      </div>
+      <div class="stuck-step">
+        <div class="stuck-num">ask AI</div>
+        <div class="body">
+          <strong>Claude -- explanation mode only</strong>
+          <p>Paste the error and what you tried. Ask: <em>"what is this error telling me and why might my approach not be working?"</em> -- not "fix this." You write the code.</p>
+        </div>
+      </div>
+      <div class="stuck-step">
+        <div class="stuck-num">flag it</div>
+        <div class="body">
+          <strong>Note it for the next sync-up</strong>
+          <p>If 1–3 haven't solved it, write down exactly where you're stuck. Bring it to the next session. Not a failure -- useful data.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <section>
+    <h2>Done when</h2>
+    <div class="callout success">
+      <ul class="check-list">
+        <li><div class="check-box"></div>Player moves, objects fall, collision ends the game, restart works</li>
+        <li><div class="check-box"></div>Score displays and updates correctly</li>
+        <li><div class="check-box"></div>You can explain what the enum is doing and why you need it -- what breaks if you just use a bool instead</li>
+        <li><div class="check-box"></div>You changed at least one thing beyond the spec (spawn rate, speed, scoring, anything)</li>
+      </ul>
+    </div>
+  </section>
+
+
+  <hr class="divider">
+
+  <section>
+    <div class="next-tag">Up next</div>
+    <p style="font-size:14px; color:var(--text-dim);">Build 03 -- <strong style="color:var(--text);">TBD based on what you've built and what's interesting.</strong> The pace picks up from here. Likely involves sprites, structured game objects, and something that starts to resemble a real game genre.</p>
+  </section>
+
+</div>
+</body>
+</html>

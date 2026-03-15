@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Build 02 — Companion</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Sora:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #0f1117;
+    --surface: #181c27;
+    --surface2: #1e2334;
+    --border: #2a3050;
+    --accent: #5b8cff;
+    --accent2: #3dffc0;
+    --warn: #ffc46b;
+    --muted: #6b7a99;
+    --text: #dde3f5;
+    --text-dim: #8a93b0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    padding: 2rem 1rem 4rem;
+  }
+
+  .page { max-width: 720px; margin: 0 auto; }
+
+  .header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: #3dffc015;
+    color: var(--accent2);
+    border: 1px solid #3dffc030;
+    border-radius: 4px;
+    padding: 3px 10px;
+    margin-bottom: 1rem;
+  }
+
+  h1 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #fff;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+  }
+
+  .subtitle { color: var(--text-dim); font-size: 14px; }
+
+  h2 {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    margin-bottom: 0.75rem;
+  }
+
+  section { margin-bottom: 2.5rem; }
+
+  p { color: var(--text-dim); font-size: 14px; margin-bottom: 0.75rem; }
+  p:last-child { margin-bottom: 0; }
+  p strong { color: var(--text); }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    background: #ffffff10;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 6px;
+    color: var(--accent2);
+  }
+
+  pre {
+    background: #11141e;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem;
+    overflow-x: auto;
+    margin: 0.75rem 0;
+  }
+
+  pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.7;
+  }
+
+  .comment { color: #4a5470; }
+  .kw { color: #8ba4ff; }
+  .fn { color: #3dffc0; }
+  .str { color: #ffd080; }
+  .num { color: #ff9f7a; }
+  .type { color: #c8a6ff; }
+
+  /* Concept blocks */
+  .concept {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+  }
+
+  .concept-header {
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    transition: background 0.15s;
+  }
+
+  .concept-header:hover { background: var(--surface2); }
+
+  .concept-header.open { background: var(--surface2); }
+
+  .concept-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .icon-blue { background: #5b8cff15; }
+  .icon-green { background: #3dffc015; }
+  .icon-warn { background: #ffc46b15; }
+  .icon-purple { background: #a78bff15; }
+
+  .concept-title-group { flex: 1; }
+
+  .concept-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .concept-summary {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+
+  .concept-toggle {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    flex-shrink: 0;
+    margin-top: 4px;
+    transition: transform 0.2s;
+  }
+
+  .concept-toggle.open { transform: rotate(90deg); }
+
+  .concept-body {
+    display: none;
+    padding: 0 1.25rem 1.25rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .concept-body.open { display: block; }
+
+  .concept-body p { margin-top: 0.75rem; }
+
+  /* Drill-down layers */
+  .drill {
+    margin-top: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .drill-header {
+    padding: 0.7rem 1rem;
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #11141e;
+    transition: background 0.15s;
+  }
+
+  .drill-header:hover { background: #161920; }
+
+  .drill-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .drill-label.math { color: var(--warn); }
+  .drill-label.impl { color: var(--accent2); }
+  .drill-label.why { color: #a78bff; }
+
+  .drill-title {
+    font-size: 13px;
+    color: var(--text-dim);
+    flex: 1;
+  }
+
+  .drill-toggle {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    transition: transform 0.2s;
+  }
+
+  .drill-toggle.open { transform: rotate(90deg); }
+
+  .drill-body {
+    display: none;
+    padding: 1rem;
+    border-top: 1px solid var(--border);
+    background: #0d1018;
+  }
+
+  .drill-body.open { display: block; }
+
+  .drill-body p {
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-bottom: 0.6rem;
+  }
+
+  .drill-body p:last-child { margin-bottom: 0; }
+
+  /* Math display */
+  .math-block {
+    background: #11141e;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin: 0.75rem 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--text);
+    line-height: 2;
+  }
+
+  .math-comment {
+    color: #4a5470;
+    font-size: 12px;
+  }
+
+  .math-hl { color: var(--accent2); }
+  .math-op { color: var(--warn); }
+
+  /* Visual diagram */
+  .diagram-wrap {
+    margin: 0.75rem 0;
+    background: #11141e;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  /* Callout */
+  .callout {
+    border-radius: 8px;
+    padding: 0.9rem 1rem;
+    margin: 0.75rem 0;
+    font-size: 13px;
+  }
+
+  .callout.note {
+    background: #5b8cff08;
+    border: 1px solid #5b8cff25;
+    color: var(--text-dim);
+  }
+
+  .callout.note strong { color: var(--accent); }
+
+  .callout.tip {
+    background: #3dffc008;
+    border: 1px solid #3dffc025;
+    color: var(--text-dim);
+  }
+
+  .callout.tip strong { color: var(--accent2); }
+
+  .callout.warn {
+    background: #ffc46b08;
+    border: 1px solid #ffc46b25;
+    color: var(--text-dim);
+  }
+
+  .callout.warn strong { color: var(--warn); }
+
+  /* Resource links */
+  .resource-row { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem; }
+
+  .resource {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 0.7rem 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    text-decoration: none;
+  }
+
+  .resource:hover { border-color: #5b8cff50; }
+
+  .resource .r-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 5px;
+    background: #5b8cff15;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 13px;
+  }
+
+  .resource .r-body strong { display: block; font-size: 13px; color: var(--accent); }
+  .resource .r-body span { font-size: 12px; color: var(--text-dim); }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+
+  /* TOC */
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 2rem;
+  }
+
+  .toc-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.6rem;
+  }
+
+  .toc a {
+    display: block;
+    font-size: 13px;
+    color: var(--text-dim);
+    text-decoration: none;
+    padding: 3px 0;
+  }
+
+  .toc a:hover { color: var(--accent); }
+
+  .toc-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-right: 8px;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="tag">Build 02 — Companion</div>
+    <h1>Concepts Behind the Build</h1>
+    <p class="subtitle">Reference doc for Build 02. Use it when something isn't clicking, or when you want to understand why something works, not just that it does. Nothing here is required reading before you start.</p>
+  </div>
+
+  <div class="toc">
+    <div class="toc-title">In this doc</div>
+    <a href="#aabb"><span class="toc-num">01</span>AABB Collision Detection</a>
+    <a href="#vector"><span class="toc-num">02</span>std::vector and the Erase-Remove Pattern</a>
+    <a href="#statemachine"><span class="toc-num">03</span>State Machines</a>
+    <a href="#structs"><span class="toc-num">04</span>Structs for Game Objects</a>
+    <a href="#spawning"><span class="toc-num">05</span>Spawning on a Timer</a>
+    <a href="#resources"><span class="toc-num">06</span>Further Reading</a>
+  </div>
+
+
+  <!-- AABB -->
+  <section id="aabb">
+    <h2>01 — AABB Collision Detection</h2>
+
+    <div class="concept">
+      <div class="concept-header" onclick="toggleConcept(this)">
+        <div class="concept-icon icon-blue">▣</div>
+        <div class="concept-title-group">
+          <span class="concept-title">What it is</span>
+          <span class="concept-summary">The simplest collision detection that actually works for rectangle-shaped things</span>
+        </div>
+        <div class="concept-toggle">▶</div>
+      </div>
+      <div class="concept-body">
+        <p>AABB stands for <strong>Axis-Aligned Bounding Box</strong>. It just means rectangles that are lined up with the screen axes -- no rotation. Your player and your falling objects are both rectangles that don't rotate, so this is exactly what you need.</p>
+        <p>The plain-language version: <strong>two rectangles overlap if they're not clearly separated in any direction.</strong> If A is not fully to the left of B, and not fully to the right of B, and not fully above B, and not fully below B -- then they must be overlapping.</p>
+        <p>Raylib gives you <code>CheckCollisionRecs()</code> which handles this for you. But it's worth understanding the logic underneath, because you'll rewrite it yourself eventually.</p>
+
+        <div class="drill">
+          <div class="drill-header" onclick="toggleDrill(this)">
+            <span class="drill-label math">math</span>
+            <span class="drill-title">The actual overlap inequality</span>
+            <span class="drill-toggle">▶</span>
+          </div>
+          <div class="drill-body">
+            <p>Two rectangles A and B. Each has a position (x, y) and a size (width, height).</p>
+            <p>They are <strong>not</strong> overlapping if any of these is true:</p>
+            <div class="math-block">
+              <span class="math-comment">// A is completely to the left of B</span><br>
+              <span class="math-hl">A.x + A.width</span> <span class="math-op">&lt;</span> <span class="math-hl">B.x</span><br><br>
+              <span class="math-comment">// A is completely to the right of B</span><br>
+              <span class="math-hl">A.x</span> <span class="math-op">&gt;</span> <span class="math-hl">B.x + B.width</span><br><br>
+              <span class="math-comment">// A is completely above B</span><br>
+              <span class="math-hl">A.y + A.height</span> <span class="math-op">&lt;</span> <span class="math-hl">B.y</span><br><br>
+              <span class="math-comment">// A is completely below B</span><br>
+              <span class="math-hl">A.y</span> <span class="math-op">&gt;</span> <span class="math-hl">B.y + B.height</span>
+            </div>
+            <p>If <strong>none</strong> of those are true, they overlap. So in code:</p>
+            <pre><code><span class="type">bool</span> <span class="fn">overlaps</span>(<span class="type">Rectangle</span> a, <span class="type">Rectangle</span> b) {
+    <span class="kw">return</span> !(a.x + a.width  &lt; b.x  ||
+             a.x           &gt; b.x + b.width  ||
+             a.y + a.height &lt; b.y  ||
+             a.y           &gt; b.y + b.height);
+}</code></pre>
+            <p>That's exactly what <code>CheckCollisionRecs()</code> does internally. Negating the four separation conditions gives you overlap.</p>
+          </div>
+        </div>
+
+        <div class="drill">
+          <div class="drill-header" onclick="toggleDrill(this)">
+            <span class="drill-label why">why</span>
+            <span class="drill-title">Why "axis-aligned" matters -- and what breaks if things rotate</span>
+            <span class="drill-toggle">▶</span>
+          </div>
+          <div class="drill-body">
+            <p>AABB only works when rectangles stay parallel to the screen axes. The moment something rotates, the bounding box math breaks -- a rotated rectangle has corners that stick outside its axis-aligned box, giving you false positives.</p>
+            <p>For rotated shapes, you'd need <strong>OBB (Oriented Bounding Box)</strong> collision or <strong>SAT (Separating Axis Theorem)</strong>. Both are more expensive to compute and more complex to implement. For most 2D games with rectangular objects, AABB is the right call -- and even games with rotated sprites often use invisible AABB hitboxes because they feel better to play.</p>
+            <p>Celeste, notably, uses very forgiving hitboxes. The player's actual collision rectangle is smaller than the visible sprite. That's a deliberate feel decision, not a technical limitation.</p>
+          </div>
+        </div>
+
+        <div class="drill">
+          <div class="drill-header" onclick="toggleDrill(this)">
+            <span class="drill-label impl">implementation</span>
+            <span class="drill-title">Using CheckCollisionRecs in your loop</span>
+            <span class="drill-toggle">▶</span>
+          </div>
+          <div class="drill-body">
+            <p><code>CheckCollisionRecs()</code> takes two <code>Rectangle</code> structs and returns a bool. A <code>Rectangle</code> in Raylib is just <code>{ x, y, width, height }</code>.</p>
+            <pre><code><span class="type">Rectangle</span> playerRect = { player.x, player.y, player.width, player.height };
+
+<span class="kw">for</span> (<span class="kw">auto</span>&amp; obj : fallingObjects) {
+    <span class="type">Rectangle</span> objRect = { obj.x, obj.y, obj.width, obj.height };
+    <span class="kw">if</span> (<span class="fn">CheckCollisionRecs</span>(playerRect, objRect)) {
+        state = <span class="type">GameState</span>::GameOver;
+        <span class="kw">break</span>;
+    }
+}</code></pre>
+            <p>The <code>break</code> after detecting a hit exits the loop early -- no point checking remaining objects if the game is already over.</p>
+            <div class="callout tip"><strong>Tip:</strong> If collisions feel unfair or too tight, shrink the player's collision rectangle slightly from its visual size. This is called a "forgiveness hitbox" and it's used in almost every action game.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- VECTOR -->
+  <section id="vector">
+    <h2>02 — std::vector and the Erase-Remove Pattern</h2>
+
+    <div class="concept">
+      <div class="concept-header" onclick="toggleConcept(this)">
+        <div class="concept-icon icon-green">[ ]</div>
+        <div class="concept-title-group">
+          <span class="concept-title">What it is</span>
+          <span class="concept-summary">A dynamic list that grows and shrinks as you add and remove objects</span>
+        </div>
+        <div class="concept-toggle">▶</div>
+      </div>
+      <div class="concept-body">
+        <p>You've used <code>std::vector</code> before. In this build it's doing something slightly more interesting: you're <strong>adding objects during gameplay</strong> (spawning) and <strong>removing them</strong> when they leave the screen. That "remove while iterating" part is where most people hit a wall.</p>
+        <p>The problem: if you loop through a vector and delete items as you go, you mess up the loop's index tracking. The standard solution is the <strong>erase-remove idiom</strong> -- a two-step pattern that C++ programmers use constantly.</p>
+
+        <div class="drill">
+          <div class="drill-header" onclick="toggleDrill(this)">
+            <span class="drill-label why">why</span>
+            <span class="drill-title">Why you can't just delete items while looping</span>
+            <span class="drill-toggle">▶</span>
+          </div>
+          <div class="drill-body">
+            <p>Imagine a vector <code>[A, B, C, D]</code> and you're looping with index <code>i</code>. You're at index 1 (B) and you erase it. The vector becomes <code>[A, C, D]</code> and the loop advances to index 2 -- but C is now at index 1. You just skipped C entirely.</p>
+            <p>This causes subtle bugs: objects that should be removed aren't, objects get skipped, iterators become invalid and crash the program. It's one of the most common beginner C++ mistakes.</p>
+          </div>
+        </div>
+
+        <div class="drill">
+          <div class="drill-header" onclick="toggleDrill(this)">
+            <span class="drill-label impl">implementation</span>
+            <span class="drill-title">The erase-remove idiom</span>
+            <span class="drill-toggle">▶</span>
+          </div>
+          <div class="drill-body">
+            <p>The pattern is a two-step: first <strong>mark</strong> items for removal using <code>std::remove_if</code>, then <strong>actually erase</strong> them with <code>erase()</code>.</p>
+            <pre><code><span class="comment">// Remove all objects that have gone off the bottom of the screen</span>
+fallingObjects.<span class="fn">erase</span>(
+    std::<span class="fn">remove_if</span>(fallingObjects.<span class="fn">begin</span>(), fallingObjects.<span class="fn">end</span>(),
+        [](<span class="kw">const</span> <span class="type">FallingObject</span>&amp; obj) {
+            <span class="kw">return</span> obj.y &gt; <span class="fn">GetScreenHeight</span>();
+        }),
+    fallingObjects.<span class="fn">end</span>()
+);</code></pre>
+            <p><code>remove_if</code> moves all the "keep" items to the front of the vector and returns an iterator pointing to where the "remove" items start. Then <code>erase</code> cuts everything from that point to the end.</p>
+            <div class="callout note"><strong>Note:</strong> <code>std::remove_if</code> is in <code>&lt;algorithm&gt;</code> -- make sure that's included at the top of your file.</div>
+          </div>
+        </div>
+
+        <div class="drill">
+          <div class="drill-header" onclick="toggleDrill(this)">
+            <span class="drill-label math">deeper</span>
+            <span class="drill-title">What remove_if actually does under the hood</span>
+            <span class="drill-toggle">▶</span>
+          </div>
+          <div class="drill-body">
+            <p><code>std::remove_if</code> doesn't actually delete anything -- it <strong>rearranges</strong> the vector in place. It uses a two-pointer technique: one pointer scans forward looking for items to keep, another tracks where the next "keep" item should be placed. Items marked for removal get overwritten by later "keep" items.</p>
+            <p>After it runs, the vector looks like <code>[keep, keep, keep, junk, junk]</code> -- the "junk" items are still technically in memory, just overwritten with garbage values. The iterator it returns points to the start of the junk zone. <code>erase()</code> then trims the vector to remove that zone.</p>
+            <p>This two-step design exists because <code>remove_if</code> is a general algorithm that works on any range, not just vectors -- it can't resize things itself. The separation of "rearrange" and "resize" is a deliberate design decision in the C++ standard library.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- STATE MACHINE -->
+  <section id="statemachine">
+    <h2>03 — State Machines</h2>
+
+    <div class="concept">
+      <div class="concept-header" onclick="toggleConcept(this)">
+        <div class="concept-icon icon-purple">◈</div>
+        <div class="concept-title-group">
+          <span class="concept-title">What it is</span>
+          <span class="concept-summary">A way of asking "what mode is the game in right now" and behaving differently in each mode</span>
+        </div>
+        <div class="concept-toggle">▶</div>
+      </div>
+      <div class="concept-body">
+        <p>A state machine is just a system that can be in one of several <strong>states</strong>, with defined rules for how it <strong>transitions</strong> between them. In Build 02 you have two states: <code>Playing</code> and <code>GameOver</code>. A hit transitions from Playing to GameOver. A restart key transitions back.</p>
+        <p>Every game you'll ever build has a state machine of some kind. Simple games have two or three states. Complex games have dozens. Getting comfortable with the pattern now pays off constantly.</p>
+
+        <div class="drill">
+          <div class="drill-header" onclick="toggleDrill(this)">
+            <span class="drill-label why">why</span>
+            <span class="drill-title">Why an enum class instead of a bool</span>
+            <span class="drill-toggle">▶</span>
+          </div>
+          <div class="drill-body">
+            <p>You could write <code>bool isGameOver = false</code> and it would work for this build. So why use an enum?</p>
+            <p>The moment you add a third state -- a title screen, a pause menu, a win condition -- a bool breaks. You'd need two bools, then three, and the combinations become hard to reason about. <code>bool isGameOver && !isPaused && !isOnTitleScreen</code> is a bug waiting to happen.</p>
+            <p>An enum scales cleanly. Adding a <code>Paused</code> state is one line. The compiler will also warn you if you forget to handle a state in a switch statement -- a bool gives you no such help.</p>
+            <pre><code><span class="kw">enum class</span> <span class="type">GameState</span> { TitleScreen, Playing, Paused, GameOver, Victory };
+<span class="comment">// Adding states later costs almost nothing</span></code></pre>
+          </div>
+        </div>
+
+        <div class="drill">
+          <div class="drill-header" onclick="toggleDrill(this)">
+            <span class="drill-label math">deeper</span>
+            <span class="drill-title">Finite State Machines — the formal concept</span>
+            <span class="drill-toggle">▶</span>
+          </div>
+          <div class="drill-body">
+            <p>What you're building is formally called a <strong>Finite State Machine (FSM)</strong>. The "finite" means there's a defined, limited set of possible states. It's one of the most foundational concepts in computer science and shows up everywhere: game AI, network protocols, compilers, UI frameworks.</p>
+            <p>A formal FSM has five components: a set of states, an initial state, a set of inputs (events), a transition function (given current state + input → next state), and optionally a set of accepting/final states.</p>
+            <p>In your game: states are <code>{Playing, GameOver}</code>, initial state is <code>Playing</code>, inputs are <code>{collision, restartKey}</code>, transitions are <code>Playing + collision → GameOver</code> and <code>GameOver + restartKey → Playing</code>.</p>
+            <p>As games get more complex, FSMs get unwieldy. A common upgrade is a <strong>Hierarchical State Machine</strong> (states that contain sub-states) or a <strong>Behavior Tree</strong> (more flexible, used heavily in game AI). Both are built on the same foundation you're using now.</p>
+          </div>
+        </div>
+
+        <div class="drill">
+          <div class="drill-header" onclick="toggleDrill(this)">
+            <span class="drill-label impl">implementation</span>
+            <span class="drill-title">Switch vs if-else for state handling</span>
+            <span class="drill-toggle">▶</span>
+          </div>
+          <div class="drill-body">
+            <p>Two common ways to branch on state. <code>if-else</code> is fine for two or three states:</p>
+            <pre><code><span class="kw">if</span> (state == <span class="type">GameState</span>::Playing) {
+    <span class="comment">// update and draw game</span>
+} <span class="kw">else if</span> (state == <span class="type">GameState</span>::GameOver) {
+    <span class="comment">// draw game over screen</span>
+}</code></pre>
+            <p><code>switch</code> is cleaner when you have more states, and the compiler warns you about unhandled cases:</p>
+            <pre><code><span class="kw">switch</span> (state) {
+    <span class="kw">case</span> <span class="type">GameState</span>::Playing:
+        <span class="comment">// update and draw game</span>
+        <span class="kw">break</span>;
+    <span class="kw">case</span> <span class="type">GameState</span>::GameOver:
+        <span class="comment">// draw game over screen</span>
+        <span class="kw">break</span>;
+}</code></pre>
+            <div class="callout tip"><strong>Tip:</strong> Get in the habit of using <code>switch</code> for state machines now. It'll serve you better as your games grow.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- STRUCTS -->
+  <section id="structs">
+    <h2>04 — Structs for Game Objects</h2>
+
+    <div class="concept">
+      <div class="concept-header" onclick="toggleConcept(this)">
+        <div class="concept-icon icon-warn">{ }</div>
+        <div class="concept-title-group">
+          <span class="concept-title">What it is</span>
+          <span class="concept-summary">Bundling related data for a game object into one named thing</span>
+        </div>
+        <div class="concept-toggle">▶</div>
+      </div>
+      <div class="concept-body">
+        <p>Instead of maintaining separate vectors for x positions, y positions, widths, and speeds of your falling objects, a struct bundles all of that into one unit. You then have a single <code>vector&lt;FallingObject&gt;</code> instead of four parallel vectors that have to stay in sync.</p>
+        <pre><code><span class="kw">struct</span> <span class="type">FallingObject</span> {
+    <span class="type">float</span> x, y;
+    <span class="type">float</span> width = <span class="num">30</span>;
+    <span class="type">float</span> height = <span class="num">30</span>;
+    <span class="type">float</span> speed;
+    <span class="type">Color</span> color;
+};</code></pre>
+        <p>Spawning a new one looks like: <code>fallingObjects.push_back({ randomX, 0, 30, 30, randomSpeed, RED });</code></p>
+
+        <div class="drill">
+          <div class="drill-header" onclick="toggleDrill(this)">
+            <span class="drill-label why">why</span>
+            <span class="drill-title">Structs vs classes -- what's the actual difference</span>
+            <span class="drill-toggle">▶</span>
+          </div>
+          <div class="drill-body">
+            <p>In C++, <code>struct</code> and <code>class</code> are almost identical. The only real difference is default access: struct members are <code>public</code> by default, class members are <code>private</code> by default.</p>
+            <p>Convention in game dev (and C++ generally): use <code>struct</code> for simple data bundles with no complex behavior, use <code>class</code> when you want to encapsulate data with methods and access control. For game objects at this stage, structs are the right call -- they're simple, readable, and get out of the way.</p>
+            <p>As your games grow, you'll likely migrate toward classes with methods like <code>update()</code> and <code>draw()</code> on each object. That's the beginning of object-oriented game architecture. Build 02 is a natural stepping stone toward that.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- SPAWNING -->
+  <section id="spawning">
+    <h2>05 — Spawning on a Timer</h2>
+
+    <div class="concept">
+      <div class="concept-header" onclick="toggleConcept(this)">
+        <div class="concept-icon icon-blue">⏱</div>
+        <div class="concept-title-group">
+          <span class="concept-title">What it is</span>
+          <span class="concept-summary">Accumulating delta time to trigger events at intervals</span>
+        </div>
+        <div class="concept-toggle">▶</div>
+      </div>
+      <div class="concept-body">
+        <p>You can't use <code>sleep()</code> or similar to wait between spawns -- that would pause the whole game. Instead, you <strong>accumulate delta time</strong> each frame and trigger a spawn once you've accumulated enough.</p>
+        <pre><code><span class="type">float</span> spawnTimer = <span class="num">0.0f</span>;
+<span class="type">float</span> spawnInterval = <span class="num">1.5f</span>; <span class="comment">// seconds between spawns</span>
+
+<span class="comment">// Inside your game loop, in the Playing state:</span>
+spawnTimer += dt;
+<span class="kw">if</span> (spawnTimer >= spawnInterval) {
+    spawnTimer = <span class="num">0.0f</span>;
+    <span class="comment">// spawn a new object</span>
+    <span class="type">float</span> randomX = <span class="fn">GetRandomValue</span>(<span class="num">0</span>, <span class="fn">GetScreenWidth</span>() - <span class="num">30</span>);
+    fallingObjects.<span class="fn">push_back</span>({ (<span class="type">float</span>)randomX, <span class="num">-30</span>, <span class="num">30</span>, <span class="num">30</span>, <span class="num">200.0f</span>, RED });
+}</code></pre>
+
+        <div class="drill">
+          <div class="drill-header" onclick="toggleDrill(this)">
+            <span class="drill-label impl">implementation</span>
+            <span class="drill-title">Making it harder over time</span>
+            <span class="drill-toggle">▶</span>
+          </div>
+          <div class="drill-body">
+            <p>Gradually reducing <code>spawnInterval</code> over time is one of the simplest ways to create a difficulty curve. Clamp it at a minimum so it doesn't go to zero:</p>
+            <pre><code><span class="comment">// Reduce spawn interval over time, minimum 0.3 seconds</span>
+spawnInterval = <span class="fn">fmax</span>(<span class="num">0.3f</span>, spawnInterval - <span class="num">0.001f</span> * dt);</code></pre>
+            <p>You can apply the same pattern to falling speed, object size, or number of simultaneous objects. Layering two or three of these creates a surprisingly deep difficulty ramp from very simple logic.</p>
+            <div class="callout warn"><strong>Watch out:</strong> Difficulty curves that feel good to design often feel brutal to play. Playtest your own game. If you're dying in under 10 seconds, the ramp is too steep.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <hr class="divider">
+
+  <!-- RESOURCES -->
+  <section id="resources">
+    <h2>06 — Further Reading</h2>
+    <div class="resource-row">
+      <a class="resource" href="https://www.learncpp.com/cpp-tutorial/an-introduction-to-stdvector/" target="_blank">
+        <div class="r-icon">📖</div>
+        <div class="r-body">
+          <strong>learncpp.com — std::vector</strong>
+          <span>Thorough coverage of vector operations including the erase-remove idiom</span>
+        </div>
+      </a>
+      <a class="resource" href="https://www.learncpp.com/cpp-tutorial/enum-classes/" target="_blank">
+        <div class="r-icon">📖</div>
+        <div class="r-body">
+          <strong>learncpp.com — enum classes</strong>
+          <span>Why enum class over plain enum, and how to use them effectively</span>
+        </div>
+      </a>
+      <a class="resource" href="https://www.learncpp.com/cpp-tutorial/introduction-to-structs-members-and-member-selection/" target="_blank">
+        <div class="r-icon">📖</div>
+        <div class="r-body">
+          <strong>learncpp.com — structs</strong>
+          <span>Covers struct basics and when to use them vs classes</span>
+        </div>
+      </a>
+      <a class="resource" href="https://gamemath.com" target="_blank">
+        <div class="r-icon">📐</div>
+        <div class="r-body">
+          <strong>3D Math Primer for Graphics and Game Development</strong>
+          <span>Free online. Excellent on collision geometry when you're ready to go deeper than AABB</span>
+        </div>
+      </a>
+      <a class="resource" href="https://www.raylib.com/examples.html" target="_blank">
+        <div class="r-icon">▶</div>
+        <div class="r-body">
+          <strong>Raylib Examples</strong>
+          <span>Browse the collision detection and shapes examples -- readable source code for each</span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  function toggleConcept(header) {
+    const body = header.nextElementSibling;
+    const toggle = header.querySelector('.concept-toggle');
+    const isOpen = body.classList.contains('open');
+    body.classList.toggle('open', !isOpen);
+    header.classList.toggle('open', !isOpen);
+    toggle.classList.toggle('open', !isOpen);
+  }
+
+  function toggleDrill(header) {
+    const body = header.nextElementSibling;
+    const toggle = header.querySelector('.drill-toggle');
+    const isOpen = body.classList.contains('open');
+    body.classList.toggle('open', !isOpen);
+    toggle.classList.toggle('open', !isOpen);
+  }
+</script>
+</body>
+</html>

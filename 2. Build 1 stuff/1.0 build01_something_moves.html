@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Build 01 — Something Moves</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Sora:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #0f1117;
+    --surface: #181c27;
+    --surface2: #1e2334;
+    --border: #2a3050;
+    --accent: #5b8cff;
+    --accent2: #3dffc0;
+    --warn: #ffc46b;
+    --muted: #6b7a99;
+    --text: #dde3f5;
+    --text-dim: #8a93b0;
+    --success: #3dffc0;
+    --code-bg: #13172200;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    padding: 2rem 1rem 4rem;
+  }
+
+  .page {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: #5b8cff18;
+    color: var(--accent);
+    border: 1px solid #5b8cff40;
+    border-radius: 4px;
+    padding: 3px 10px;
+    margin-bottom: 1rem;
+  }
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #fff;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+  }
+
+  .subtitle {
+    color: var(--text-dim);
+    font-size: 14px;
+  }
+
+  .meta-row {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .meta-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent2);
+    flex-shrink: 0;
+  }
+
+  .meta-dot.warn { background: var(--warn); }
+
+  h2 {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    margin-bottom: 0.75rem;
+  }
+
+  section {
+    margin-bottom: 2.5rem;
+  }
+
+  .callout {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+  }
+
+  .callout.accent {
+    border-color: #5b8cff30;
+    background: #5b8cff08;
+  }
+
+  .callout.warn {
+    border-color: #ffc46b35;
+    background: #ffc46b08;
+  }
+
+  .callout.success {
+    border-color: #3dffc030;
+    background: #3dffc008;
+  }
+
+  .callout p {
+    color: var(--text-dim);
+    font-size: 14px;
+  }
+
+  .callout strong {
+    color: var(--text);
+  }
+
+  .callout-title {
+    font-weight: 600;
+    font-size: 13px;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .callout-title .icon {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+
+  .icon-blue { background: #5b8cff25; color: var(--accent); }
+  .icon-warn { background: #ffc46b25; color: var(--warn); }
+  .icon-green { background: #3dffc025; color: var(--accent2); }
+
+  .step-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+  }
+
+  .step {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .step-num {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .step-body {
+    flex: 1;
+  }
+
+  .step-body strong {
+    display: block;
+    font-size: 14px;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+
+  .step-body p, .step-body span {
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  .step-body a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .step-body a:hover { text-decoration: underline; }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    background: #ffffff10;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 6px;
+    color: var(--accent2);
+  }
+
+  pre {
+    background: #11141e;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem;
+    overflow-x: auto;
+    margin-top: 0.75rem;
+  }
+
+  pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.7;
+  }
+
+  .comment { color: #4a5470; }
+  .kw { color: #8ba4ff; }
+  .fn { color: #3dffc0; }
+  .str { color: #ffd080; }
+  .num { color: #ff9f7a; }
+  .type { color: #c8a6ff; }
+
+  .concept-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+  }
+
+  .concept-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+  }
+
+  .concept-card .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .concept-card p {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+
+  .check-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .check-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--text-dim);
+  }
+
+  .check-box {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    border: 1.5px solid var(--border);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 2rem 0;
+  }
+
+  .next-tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    background: #3dffc015;
+    color: var(--accent2);
+    border: 1px solid #3dffc030;
+    border-radius: 4px;
+    padding: 2px 8px;
+    margin-bottom: 0.5rem;
+  }
+
+  .stuck-protocol {
+    counter-reset: stuck;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .stuck-step {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.9rem 1rem;
+  }
+
+  .stuck-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--warn);
+    background: #ffc46b18;
+    border-radius: 4px;
+    padding: 2px 7px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .stuck-step .body strong {
+    font-size: 14px;
+    color: var(--text);
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .stuck-step .body p {
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  .resource-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-top: 0.5rem;
+  }
+
+  .resource {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 0.75rem 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    text-decoration: none;
+  }
+
+  .resource:hover { border-color: #5b8cff50; }
+
+  .resource .r-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    background: #5b8cff15;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 14px;
+  }
+
+  .resource .r-body strong {
+    display: block;
+    font-size: 14px;
+    color: var(--accent);
+  }
+
+  .resource .r-body span {
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="tag">Build 01</div>
+    <h1>Something Moves</h1>
+    <p class="subtitle">Your first Raylib program. A window opens. Something bounces. You shipped a game loop.</p>
+    <div class="meta-row">
+      <div class="meta-item"><div class="meta-dot"></div>2–4 hours</div>
+      <div class="meta-item"><div class="meta-dot"></div>C++ + Raylib</div>
+      <div class="meta-item"><div class="meta-dot warn"></div>Compiler setup is the only real friction point</div>
+    </div>
+  </div>
+
+
+  <section>
+    <h2>Why this project</h2>
+    <div class="callout accent">
+      <div class="callout-title"><div class="icon icon-blue">→</div> The game loop is everything</div>
+      <p>Every game you'll ever build — Pong, a roguelike, whatever Noita-style chaos you eventually make — runs on a loop: <strong>update state → draw frame → repeat</strong>. This project puts that loop in your hands in the simplest possible context. You'll use it a thousand times. Better to understand it now when there's nothing else to worry about.</p>
+    </div>
+  </section>
+
+
+  <section>
+    <h2>What you're building</h2>
+    <p style="color:var(--text-dim); font-size:14px; margin-bottom:1rem;">A window opens. A ball moves. It bounces off the walls. That's it. You can add color changes, sound, multiple balls — whatever — once it works.</p>
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="label">Game loop</div>
+        <p>while the window is open: update everything, draw everything, repeat 60× per second</p>
+      </div>
+      <div class="concept-card">
+        <div class="label">Delta time</div>
+        <p>movement that's tied to real time, not frame count — this matters more than it seems right now</p>
+      </div>
+      <div class="concept-card">
+        <div class="label">Collision</div>
+        <p>detecting when your ball hits a wall boundary and reversing its direction</p>
+      </div>
+      <div class="concept-card">
+        <div class="label">Draw calls</div>
+        <p>clearing the screen and drawing shapes each frame so it looks like motion</p>
+      </div>
+    </div>
+  </section>
+
+
+  <section>
+    <h2>Resources</h2>
+    <div class="resource-row">
+      <a class="resource" href="https://www.raylib.com/cheatsheet/cheatsheet.html" target="_blank">
+        <div class="r-icon">📋</div>
+        <div class="r-body">
+          <strong>Raylib Cheatsheet</strong>
+          <span>Pin this tab. Every function you'll need is on one page.</span>
+        </div>
+      </a>
+      <a class="resource" href="https://github.com/raysan5/raylib/wiki/Working-on-Windows" target="_blank">
+        <div class="r-icon">🪟</div>
+        <div class="r-body">
+          <strong>Raylib Windows Setup Guide</strong>
+          <span>Official wiki. If you hit a wall here, that's expected — see the stuck protocol below.</span>
+        </div>
+      </a>
+      <a class="resource" href="https://www.learncpp.com" target="_blank">
+        <div class="r-icon">📖</div>
+        <div class="r-body">
+          <strong>learncpp.com</strong>
+          <span>Your C++ reference. Don't read it front to back — search when you hit a concept you want to understand better.</span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+
+  <section>
+    <h2>Build it</h2>
+
+    <div class="callout warn" style="margin-bottom:1.25rem;">
+      <div class="callout-title"><div class="icon icon-warn">!</div> Heads up before you start</div>
+      <p>Getting the compiler and Raylib to talk to each other on Windows is the most annoying part of this whole project. It's annoying for <strong>everyone</strong> — it has nothing to do with whether you're good at this. If setup takes 2 hours, that's normal. The actual code is an hour.</p>
+    </div>
+
+    <div class="step-list">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <strong>Get Raylib running</strong>
+          <span>Follow the Windows setup guide above. Your goal: run one of the example files and see a window open. Don't move on until you have that.</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <strong>Open a blank window</strong>
+          <span>Create a new .cpp file. Get a window open and closing cleanly with the skeleton below. This is your starting point.</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <strong>Make something appear</strong>
+          <span>Draw a circle inside <code>BeginDrawing()</code>. Compile. See it. Now you know the draw pipeline works.</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <strong>Make it move</strong>
+          <span>Add position and velocity variables. Update position each frame using <code>GetFrameTime()</code>. Watch it slide off the screen. That's expected — walls come next.</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <strong>Add wall bounce</strong>
+          <span>Check if the ball's position + radius exceeds the window boundary. If it does, flip the relevant velocity. Left edge = flip x. Top edge = flip y. Etc.</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-body">
+          <strong>Mess with it</strong>
+          <span>Change the speed. Change the size. Add a second ball. Make it change color on bounce. This step isn't optional — it's where the actual learning happens.</span>
+        </div>
+      </div>
+    </div>
+
+    <pre><code><span class="comment">// Skeleton — the minimum viable game loop</span>
+<span class="kw">#include</span> <span class="str">"raylib.h"</span>
+
+<span class="type">int</span> <span class="fn">main</span>() {
+    <span class="fn">InitWindow</span>(<span class="num">800</span>, <span class="num">600</span>, <span class="str">"Something Moves"</span>);
+    <span class="fn">SetTargetFPS</span>(<span class="num">60</span>);
+
+    <span class="comment">// your variables go here (position, velocity, etc.)</span>
+
+    <span class="kw">while</span> (!<span class="fn">WindowShouldClose</span>()) {
+        <span class="type">float</span> dt = <span class="fn">GetFrameTime</span>();  <span class="comment">// seconds since last frame</span>
+
+        <span class="comment">// UPDATE: move things, check collisions</span>
+
+        <span class="fn">BeginDrawing</span>();
+            <span class="fn">ClearBackground</span>(BLACK);
+            <span class="comment">// DRAW: put things on screen here</span>
+        <span class="fn">EndDrawing</span>();
+    }
+
+    <span class="fn">CloseWindow</span>();
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+  </section>
+
+
+  <section>
+    <h2>When you get stuck</h2>
+    <p style="font-size:13px; color:var(--text-dim); margin-bottom:0.9rem;">Use this in order. Don't skip straight to the end.</p>
+    <div class="stuck-protocol">
+      <div class="stuck-step">
+        <div class="stuck-num">20 min</div>
+        <div class="body">
+          <strong>Work it yourself</strong>
+          <p>Read the error message. Find the specific line. Check the Raylib cheatsheet or learncpp.com. This is the part that actually builds skill.</p>
+        </div>
+      </div>
+      <div class="stuck-step">
+        <div class="stuck-num">rubber duck</div>
+        <div class="body">
+          <strong>Explain it out loud</strong>
+          <p>Say the problem to yourself or write it in a comment. "My ball is moving but it's not bouncing because..." — often this unsticks you without any help at all.</p>
+        </div>
+      </div>
+      <div class="stuck-step">
+        <div class="stuck-num">ask AI</div>
+        <div class="body">
+          <strong>Claude — explanation mode only</strong>
+          <p>Paste your error and what you tried. Ask: <em>"what is this error telling me and why might my approach not be working?"</em> — not "fix this." You write the code. AI explains the concept.</p>
+        </div>
+      </div>
+      <div class="stuck-step">
+        <div class="stuck-num">flag it</div>
+        <div class="body">
+          <strong>Note it for the next check-in</strong>
+          <p>If 1–3 haven't solved it, write down exactly where you're stuck and bring it to your next session. This is not failing. It's useful data.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <section>
+    <h2>Done when</h2>
+    <div class="callout success">
+      <ul class="check-list">
+        <li><div class="check-box"></div>Window opens, something moves, bounces off all four walls</li>
+        <li><div class="check-box"></div>You changed at least one variable to see what happened (speed, size, direction)</li>
+        <li><div class="check-box"></div>You can explain — roughly — what <code>GetFrameTime()</code> is doing and why it matters</li>
+      </ul>
+    </div>
+  </section>
+
+
+  <hr class="divider">
+
+  <section>
+    <div class="next-tag">Up next</div>
+    <p style="font-size:14px; color:var(--text-dim);">Build 02 — <strong style="color:var(--text);">Something Interactive.</strong> Player input, falling objects, collision, a score, a way to lose, a way to restart. First thing that actually feels like a game.</p>
+  </section>
+
+</div>
+</body>
+</html>
