@@ -144,6 +144,24 @@
   .callout.warn { border-color: #ffc46b35; background: #ffc46b08; }
   .callout.success { border-color: #3dffc030; background: #3dffc008; }
 
+  .callout pre {
+    background: #11141e;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    overflow-x: auto;
+    margin: 0.6rem 0;
+  }
+
+  .callout pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 12px;
+    color: var(--text);
+    line-height: 1.7;
+  }
+
   .callout p { color: var(--text-dim); font-size: 14px; }
   .callout strong { color: var(--text); }
 
@@ -643,15 +661,28 @@
     </div>
 
     <div class="callout accent" style="margin: 1.25rem 0;">
-      <div class="callout-title"><div class="icon icon-blue">→</div> How position, velocity, and delta time connect</div>
-      <p>Before step 4, the relationship between these three things is worth understanding explicitly.</p>
-      <p style="margin-top:0.6rem;"><strong>Velocity</strong> is direction - use <code>1</code> or <code>-1</code> for each axis. <strong>Speed</strong> is how many pixels per second you want to move. <strong>Delta time</strong> (<code>dt</code>) is how many seconds the last frame took.</p>
-      <p style="margin-top:0.6rem;">Each frame, update position like this:</p>
-      <div style="background:#11141e; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin:0.6rem 0; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim);">
-        new position = old position + (direction × speed × time elapsed)
-      </div>
-      <p>In code that becomes <code>x += velocityX * speed * dt;</code> and <code>y += velocityY * speed * dt;</code> -- put both in the UPDATE section of the game loop, before <code>BeginDrawing()</code>.</p>
-      <p style="margin-top:0.6rem;">Multiplying by <code>dt</code> means the ball moves the same speed on any machine regardless of frame rate. At 200 pixels/second and 60fps, each frame moves the ball ~3.2 pixels. 60 frames later: 200 pixels.</p>
+      <div class="callout-title"><div class="icon icon-blue">→</div> How position variables work</div>
+      <p><code>x</code> and <code>y</code> store the ball's position in pixels from the top-left corner of the window. Initialize them near center as <code>float</code>, along with a radius:</p>
+      <pre><code><span class="type">float</span> x = <span class="num">400.0f</span>;
+<span class="type">float</span> y = <span class="num">300.0f</span>;
+<span class="type">float</span> radius = <span class="num">25.0f</span>;</code></pre>
+      <p style="margin-top:0.6rem;">Use <code>float</code>, not <code>int</code> or <code>double</code>. Position updates involve fractional amounts each frame -- an <code>int</code> would discard those fractions and cause stuttering. <code>double</code> has more precision than needed and doesn't match Raylib's expected types. The <code>f</code> suffix on <code>400.0f</code> tells the compiler these are floats, not doubles.</p>
+      <p style="margin-top:0.6rem;"><strong>Updating position each frame.</strong> In the UPDATE section, use <code>+=</code> to advance position:</p>
+      <pre><code>x += velocityX * speed * dt;
+y += velocityY * speed * dt;</code></pre>
+      <p><code>x += ...</code> is shorthand for <code>x = x + ...</code> -- same variable, read and updated on the same line.</p>
+      <p style="margin-top:0.6rem;"><strong>Connecting position to what gets drawn.</strong> Pass <code>x</code> and <code>y</code> to <code>DrawCircle()</code> in the DRAW section:</p>
+      <pre><code><span class="fn">DrawCircle</span>((<span class="type">int</span>)x, (<span class="type">int</span>)y, radius, RED);</code></pre>
+      <p><code>DrawCircle</code> expects <code>int</code> for its position parameters -- that's Raylib's design. Your variables stay as <code>float</code> for precision; the <code>(int)</code> cast converts them only at the moment of drawing.</p>
+      <p style="margin-top:0.6rem;">Each frame the full sequence is:</p>
+      <pre><code><span class="comment">// UPDATE</span>
+x += velocityX * speed * dt;
+y += velocityY * speed * dt;
+
+<span class="comment">// DRAW</span>
+<span class="fn">ClearBackground</span>(BLACK);
+<span class="fn">DrawCircle</span>((<span class="type">int</span>)x, (<span class="type">int</span>)y, radius, RED);</code></pre>
+      <p><code>ClearBackground</code> wipes the previous frame so the ball appears to move rather than leaving a trail.</p>
     </div>
 
     <div class="step-list" style="margin-top:0;">
@@ -660,7 +691,7 @@
         <div class="step-num">4</div>
         <div class="step-body">
           <strong>Make it move</strong>
-          <span>Using the formula above, update <code>x</code> and <code>y</code> each frame in the UPDATE section. Compile and run. The ball will slide off the screen in one direction. That's expected -- walls come next.</span>
+          <span>Declare <code>velocityX</code>, <code>velocityY</code>, and <code>speed</code> as floats. Set <code>velocityX</code> and <code>velocityY</code> to <code>1.0f</code> or <code>-1.0f</code> for direction. Use the sequence above to update and draw each frame. Watch the ball slide off screen -- walls come next.</span>
         </div>
       </div>
 
