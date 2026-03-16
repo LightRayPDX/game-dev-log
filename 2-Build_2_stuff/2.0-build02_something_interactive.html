@@ -594,39 +594,92 @@
           <span>Copy it. Strip out the bouncing ball. You want a clean game loop - window, delta time, begin/end drawing.</span>
         </div>
       </div>
+    </div>
+
+    <div class="callout accent" style="margin: 1.25rem 0;">
+      <div class="callout-title"><div class="icon icon-blue">→</div> Clamping -- keeping the player on screen</div>
+      <p>Clamping means constraining a value to stay within a range. For the player, you want <code>x</code> to never go below 0 (left edge) or above the right edge of the screen.</p>
+      <p style="margin-top:0.6rem;">After updating the player's x position each frame, clamp it like this:</p>
+      <div style="background:#11141e; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin:0.6rem 0; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim); line-height:1.8;">
+        if (x &lt; 0) x = 0;<br>
+        if (x + playerWidth &gt; GetScreenWidth()) x = GetScreenWidth() - playerWidth;
+      </div>
+      <p>Note it's <code>x + playerWidth</code> on the right side -- the player's right edge has to stay inside the window, not just its left edge.</p>
+    </div>
+
+    <div class="step-list" style="margin-top:0;">
       <div class="step">
         <div class="step-num">2</div>
         <div class="step-body">
           <strong>Add a player rectangle <span class="step-badge badge-carry">carry</span></strong>
-          <span>Position at the bottom center. Read <code>IsKeyDown(KEY_LEFT)</code> and <code>IsKeyDown(KEY_RIGHT)</code> each frame and update x position. Clamp it so it can't leave the screen. You've done position + boundary logic before.</span>
+          <span>Position at the bottom center. Read <code>IsKeyDown(KEY_LEFT)</code> and <code>IsKeyDown(KEY_RIGHT)</code> each frame and update x position. Use the clamping logic above to keep it on screen.</span>
         </div>
       </div>
       <div class="step">
         <div class="step-num">3</div>
         <div class="step-body">
           <strong>Spawn one falling object <span class="step-badge badge-new">new</span></strong>
-          <span>A single rectangle with a random x position at the top, falling at a fixed speed. Get it falling and disappearing when it hits the bottom before adding more.</span>
+          <span>A single rectangle with a random x position at the top, falling at a fixed speed using the same velocity pattern from Build 01. Get it falling and disappearing when it hits the bottom before adding more.</span>
         </div>
       </div>
+    </div>
+
+    <div class="callout accent" style="margin: 1.25rem 0;">
+      <div class="callout-title"><div class="icon icon-blue">→</div> Structs and the spawn timer pattern</div>
+      <p>Step 4 introduces two things at once. Before you start, it's worth understanding each one.</p>
+      <p style="margin-top:0.6rem;"><strong>Structs</strong> bundle related variables into one named type. Instead of separate <code>objX</code>, <code>objY</code>, <code>objSpeed</code> variables, you define a struct once and create as many instances as you need:</p>
+      <div style="background:#11141e; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin:0.6rem 0; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim); line-height:1.8;">
+        struct FallingObject {<br>
+        &nbsp;&nbsp;float x, y;<br>
+        &nbsp;&nbsp;float width = 30;<br>
+        &nbsp;&nbsp;float height = 30;<br>
+        &nbsp;&nbsp;float speed;<br>
+        };
+      </div>
+      <p style="margin-top:0.6rem;"><strong>The spawn timer</strong> uses the same delta time pattern from Build 01 -- accumulate time each frame, trigger when enough has passed:</p>
+      <div style="background:#11141e; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin:0.6rem 0; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim); line-height:1.8;">
+        spawnTimer += dt;<br>
+        if (spawnTimer >= spawnInterval) {<br>
+        &nbsp;&nbsp;spawnTimer = 0.0f;<br>
+        &nbsp;&nbsp;// add a new object to the vector<br>
+        }
+      </div>
+      <p>The companion doc covers both in depth -- see sections 04 (Structs) and 05 (Spawning on a Timer).</p>
+    </div>
+
+    <div class="step-list" style="margin-top:0;">
       <div class="step">
         <div class="step-num">4</div>
         <div class="step-body">
           <strong>Make it a <code>std::vector</code> of objects <span class="step-badge badge-new">new</span></strong>
-          <span>Move your falling object into a struct. Create a <code>std::vector</code> of them. Spawn a new one on a timer. Loop through the vector to update and draw each one. Remove objects that exit the screen bottom using the erase-remove pattern - look this up, it's a standard C++ idiom worth knowing.</span>
+          <span>Move your falling object into a struct (see above). Create a <code>std::vector</code> of them. Spawn a new one on a timer. Loop through the vector to update and draw each one. Remove objects that exit the screen bottom using the erase-remove pattern - covered in companion doc section 02.</span>
         </div>
       </div>
+    </div>
+
+    <div class="callout accent" style="margin: 1.25rem 0;">
+      <div class="callout-title"><div class="icon icon-blue">→</div> The Rectangle type and CheckCollisionRecs</div>
+      <p>Raylib's <code>CheckCollisionRecs()</code> takes two <code>Rectangle</code> structs -- not individual x, y, width, height variables. A <code>Rectangle</code> is just those four values bundled together.</p>
+      <p style="margin-top:0.6rem;">Construct one from your variables like this:</p>
+      <div style="background:#11141e; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin:0.6rem 0; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim); line-height:1.8;">
+        Rectangle playerRect = { player.x, player.y, player.width, player.height };
+      </div>
+      <p>Do the same for each falling object, then pass both to <code>CheckCollisionRecs()</code>. It returns <code>true</code> if they overlap.</p>
+    </div>
+
+    <div class="step-list" style="margin-top:0;">
       <div class="step">
         <div class="step-num">5</div>
         <div class="step-body">
           <strong>Add AABB collision detection <span class="step-badge badge-new">new</span></strong>
-          <span>For each falling object, check if its rectangle overlaps the player rectangle. Raylib has <code>CheckCollisionRecs()</code> - use it. When a hit is detected, switch game state to <code>GameOver</code>.</span>
+          <span>For each falling object, construct a <code>Rectangle</code> from its variables and check against the player rectangle using <code>CheckCollisionRecs()</code>. When a hit is detected, switch game state to <code>GameOver</code>.</span>
         </div>
       </div>
       <div class="step">
         <div class="step-num">6</div>
         <div class="step-body">
           <strong>Add game state + score <span class="step-badge badge-new">new</span></strong>
-          <span>Implement the enum from above. In <code>Playing</code>: increment a score counter each frame (or each object dodged). In <code>GameOver</code>: draw the score and "press R to restart." On restart, clear the vector, reset the score, reset player position, switch state back to <code>Playing</code>.</span>
+          <span>Implement the enum from above. In <code>Playing</code>: increment a score counter each frame (or each object dodged). In <code>GameOver</code>: draw the score and "press R to restart." On restart: call <code>fallingObjects.clear()</code> to empty the vector, reset score, reset player position, switch state back to <code>Playing</code>.</span>
         </div>
       </div>
       <div class="step">

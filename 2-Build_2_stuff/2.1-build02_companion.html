@@ -480,7 +480,8 @@
             <span class="drill-toggle">▶</span>
           </div>
           <div class="drill-body">
-            <p><code>CheckCollisionRecs()</code> takes two <code>Rectangle</code> structs and returns a bool. A <code>Rectangle</code> in Raylib is just <code>{ x, y, width, height }</code>.</p>
+            <p><code>CheckCollisionRecs()</code> takes two <code>Rectangle</code> structs and returns a bool. A <code>Rectangle</code> in Raylib is a struct with four fields: <code>x</code>, <code>y</code>, <code>width</code>, <code>height</code> - all floats.</p>
+            <p>Your game objects likely store these as separate variables. Construct a <code>Rectangle</code> from them before passing to the function:</p>
             <pre><code><span class="type">Rectangle</span> playerRect = { player.x, player.y, player.width, player.height };
 
 <span class="kw">for</span> (<span class="kw">auto</span>&amp; obj : fallingObjects) {
@@ -664,7 +665,22 @@ fallingObjects.<span class="fn">erase</span>(
     <span class="type">float</span> speed;
     <span class="type">Color</span> color;
 };</code></pre>
-        <p>Spawning a new one looks like: <code>fallingObjects.push_back({ randomX, 0, 30, 30, randomSpeed, RED });</code></p>
+        <p>Creating an instance and adding it to a vector:</p>
+        <pre><code><span class="comment">// Construct inline with push_back</span>
+fallingObjects.<span class="fn">push_back</span>({ randomX, <span class="num">-30</span>, <span class="num">30</span>, <span class="num">30</span>, <span class="num">200.0f</span>, RED });
+
+<span class="comment">// Or create a named instance first</span>
+<span class="type">FallingObject</span> obj;
+obj.x = randomX;
+obj.y = <span class="num">-30</span>;
+obj.speed = <span class="num">200.0f</span>;
+obj.color = RED;
+fallingObjects.<span class="fn">push_back</span>(obj);</code></pre>
+        <p>Accessing fields on objects already in the vector:</p>
+        <pre><code><span class="kw">for</span> (<span class="kw">auto</span>&amp; obj : fallingObjects) {
+    obj.y += obj.speed * dt; <span class="comment">// move each object down</span>
+    <span class="fn">DrawRectangle</span>((<span class="type">int</span>)obj.x, (<span class="type">int</span>)obj.y, (<span class="type">int</span>)obj.width, (<span class="type">int</span>)obj.height, obj.color);
+}</code></pre>
 
         <div class="drill">
           <div class="drill-header" onclick="toggleDrill(this)">
