@@ -639,18 +639,51 @@
           <span>Draw a circle inside <code>BeginDrawing()</code>. Compile. See it. Now you know the draw pipeline works.</span>
         </div>
       </div>
+
+    </div>
+
+    <div class="callout accent" style="margin: 1.25rem 0;">
+      <div class="callout-title"><div class="icon icon-blue">→</div> How position, velocity, and delta time connect</div>
+      <p>Before step 4, the relationship between these three things is worth understanding explicitly.</p>
+      <p style="margin-top:0.6rem;"><strong>Velocity</strong> is direction - use <code>1</code> or <code>-1</code> for each axis. <strong>Speed</strong> is how many pixels per second you want to move. <strong>Delta time</strong> (<code>dt</code>) is how many seconds the last frame took.</p>
+      <p style="margin-top:0.6rem;">Each frame, update position like this:</p>
+      <div style="background:#11141e; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin:0.6rem 0; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim);">
+        new position = old position + (direction × speed × time elapsed)
+      </div>
+      <p>In code that becomes <code>x += velocityX * speed * dt;</code> and <code>y += velocityY * speed * dt;</code> -- put both in the UPDATE section of the game loop, before <code>BeginDrawing()</code>.</p>
+      <p style="margin-top:0.6rem;">Multiplying by <code>dt</code> means the ball moves the same speed on any machine regardless of frame rate. At 200 pixels/second and 60fps, each frame moves the ball ~3.2 pixels. 60 frames later: 200 pixels.</p>
+    </div>
+
+    <div class="step-list" style="margin-top:0;">
+
       <div class="step">
         <div class="step-num">4</div>
         <div class="step-body">
           <strong>Make it move</strong>
-          <span>Add position and velocity variables. Update position each frame using <code>GetFrameTime()</code>. Watch it slide off the screen. That's expected — walls come next.</span>
+          <span>Using the formula above, update <code>x</code> and <code>y</code> each frame in the UPDATE section. Compile and run. The ball will slide off the screen in one direction. That's expected -- walls come next.</span>
         </div>
       </div>
+
+    </div>
+
+    <div class="callout accent" style="margin: 1.25rem 0;">
+      <div class="callout-title"><div class="icon icon-blue">→</div> How wall bounce works</div>
+      <p>The ball has a physical size -- its edge reaches the wall before its center does. So the boundary check isn't just "is x past the wall?" -- it's "is x + radius past the wall?"</p>
+      <p style="margin-top:0.6rem;">When the ball hits a wall, you reverse direction by multiplying the relevant velocity by <code>-1</code>. Which velocity depends on which wall:</p>
+      <div style="background:#11141e; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin:0.6rem 0; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim); line-height:1.8;">
+        left or right wall → flip velocityX &nbsp;(velocityX *= -1)<br>
+        top or bottom wall → flip velocityY &nbsp;(velocityY *= -1)
+      </div>
+      <p>You need four checks -- one per edge. Right edge: <code>x + radius &gt;= GetScreenWidth()</code>. Left edge: <code>x - radius &lt;= 0</code>. Same pattern for top and bottom using <code>y</code> and <code>GetScreenHeight()</code>. Put all four in the UPDATE section.</p>
+    </div>
+
+    <div class="step-list" style="margin-top:0;">
+
       <div class="step">
         <div class="step-num">5</div>
         <div class="step-body">
           <strong>Add wall bounce</strong>
-          <span>Check if the ball's position + radius exceeds the window boundary. If it does, flip the relevant velocity. Left edge = flip x. Top edge = flip y. Etc.</span>
+          <span>Using the logic above, add four boundary checks in the UPDATE section -- one per edge. When a check fires, flip the relevant velocity.</span>
         </div>
       </div>
       <div class="step">
