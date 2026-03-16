@@ -484,6 +484,7 @@
             <p>Your game objects likely store these as separate variables. Construct a <code>Rectangle</code> from them before passing to the function:</p>
             <pre><code><span class="type">Rectangle</span> playerRect = { player.x, player.y, player.width, player.height };
 
+<span class="comment">// for (auto& obj : ...) is a range-based for loop -- covered in build doc step 4</span>
 <span class="kw">for</span> (<span class="kw">auto</span>&amp; obj : fallingObjects) {
     <span class="type">Rectangle</span> objRect = { obj.x, obj.y, obj.width, obj.height };
     <span class="kw">if</span> (<span class="fn">CheckCollisionRecs</span>(playerRect, objRect)) {

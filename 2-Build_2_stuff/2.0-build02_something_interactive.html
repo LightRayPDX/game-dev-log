@@ -571,7 +571,8 @@
       </div>
     </div>
 
-    <pre style="margin-top:1rem;"><code><span class="kw">enum class</span> <span class="type">GameState</span> { Playing, GameOver };
+    <p style="color:var(--text-dim); font-size:14px; margin-top:1rem; margin-bottom:0.5rem;">The code that implements this uses an <strong style="color:var(--text);">enum</strong> -- a type that can only hold one of a fixed set of named values. You define exactly which values are valid, and the compiler won't let you assign anything else. <code>enum class</code> is the modern C++ form. The <code>class</code> scopes the values to the enum name -- you write <code>GameState::Playing</code>, not just <code>Playing</code>. That prevents naming collisions as your codebase grows.</p>
+    <pre style="margin-top:0.5rem;"><code><span class="kw">enum class</span> <span class="type">GameState</span> { Playing, GameOver };
 <span class="type">GameState</span> state = <span class="type">GameState</span>::Playing;
 
 <span class="comment">// In your game loop:</span>
@@ -601,10 +602,30 @@
       <p>Clamping means constraining a value to stay within a range. For the player, you want <code>x</code> to never go below 0 (left edge) or above the right edge of the screen.</p>
       <p style="margin-top:0.6rem;">After updating the player's x position each frame, clamp it like this:</p>
       <div style="background:#11141e; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin:0.6rem 0; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim); line-height:1.8;">
-        if (x &lt; 0) x = 0;<br>
-        if (x + playerWidth &gt; GetScreenWidth()) x = GetScreenWidth() - playerWidth;
+        if (player.x &lt; 0) player.x = 0;<br>
+        if (player.x + player.width &gt; (float)GetScreenWidth()) player.x = (float)GetScreenWidth() - player.width;
       </div>
-      <p>Note it's <code>x + playerWidth</code> on the right side -- the player's right edge has to stay inside the window, not just its left edge.</p>
+      <p>Note it's <code>player.x + player.width</code> on the right side -- the player's right edge has to stay inside the window, not just its left edge.</p>
+      <p style="margin-top:0.4rem;"><code>GetScreenWidth()</code> returns an <code>int</code>. <code>player.x</code> and <code>player.width</code> are floats. The <code>(float)</code> cast converts the int so the comparison and arithmetic work correctly.</p>
+    </div>
+
+    <div class="callout accent" style="margin: 1.25rem 0;">
+      <div class="callout-title"><div class="icon icon-blue">→</div> Player movement and delta time</div>
+      <p>Player movement uses the same relationship as Build 01:</p>
+      <div style="background:#11141e; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin:0.6rem 0; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim); line-height:1.8;">
+        new position = current position + (speed * delta time)
+      </div>
+      <p style="margin-top:0.6rem;">In code:</p>
+      <div style="background:#11141e; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin:0.6rem 0; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim); line-height:1.8;">
+        player.x += speed * GetFrameTime();
+      </div>
+      <p style="margin-top:0.6rem;"><code>speed</code> is pixels per second. <code>GetFrameTime()</code> is the time since the last frame in seconds -- at 60fps, around 0.016. Multiplied together: pixels-per-second &times; seconds = pixels moved this frame. The player moves the same distance regardless of frame rate.</p>
+      <p style="margin-top:0.4rem;"><code>player.x +=</code> is shorthand for <code>player.x = player.x + ...</code>. This goes in UPDATE -- movement changes state, it doesn't draw anything.</p>
+      <p style="margin-top:0.6rem;">Declare <code>speed</code> with the rest of your variables, before the game loop:</p>
+      <div style="background:#11141e; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin:0.6rem 0; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim); line-height:1.8;">
+        float speed = 200.0f;
+      </div>
+      <p style="margin-top:0.4rem;">Type: <code>float</code> -- multiplied by <code>GetFrameTime()</code>, which is also a float. Initial value: <code>200.0f</code> -- pixels per second. Adjust once you can see it running. This is the only place you need to change it.</p>
     </div>
 
     <div class="step-list" style="margin-top:0;">
@@ -612,7 +633,9 @@
         <div class="step-num">2</div>
         <div class="step-body">
           <strong>Add a player rectangle <span class="step-badge badge-carry">carry</span></strong>
-          <span>Position at the bottom center. Read <code>IsKeyDown(KEY_LEFT)</code> and <code>IsKeyDown(KEY_RIGHT)</code> each frame and update x position. Use the clamping logic above to keep it on screen.</span>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.3rem;">Declare <code>Rectangle player</code> positioned at the bottom center. Each frame, read input and update <code>player.x</code> using the movement formula above. Apply clamping after movement to keep it on screen.</p>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;"><code>IsKeyDown</code> returns <code>true</code> every frame a key is held -- movement code inside <code>if (IsKeyDown(...))</code> runs continuously for as long as the key stays down. <code>IsKeyPressed</code> is different: it fires once on the first frame a key goes down, then nothing until it's released and pressed again. Use <code>IsKeyPressed</code> for one-shot actions. Use <code>IsKeyDown</code> for held movement.</p>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;">Draw the player in DRAW using <code>DrawRectangleRec(player, BLUE)</code>. Because <code>player</code> is already a <code>Rectangle</code>, no casts needed.</p>
         </div>
       </div>
       <div class="step">
@@ -647,24 +670,58 @@
       <p>The companion doc covers both in depth -- see sections 04 (Structs) and 05 (Spawning on a Timer).</p>
     </div>
 
+    <div class="callout accent" style="margin: 1.25rem 0;">
+      <div class="callout-title"><div class="icon icon-blue">→</div> For loops and iterating over a vector</div>
+      <p>A <strong>for loop</strong> runs a block of code once for each element in a collection. With a vector of falling objects, a for loop is how you visit each one in turn.</p>
+      <p style="margin-top:0.6rem;">The range-based form handles the indexing for you:</p>
+      <div style="background:#11141e; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin:0.6rem 0; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim); line-height:1.8;">
+        for (auto&amp; obj : fallingObjects) {<br>
+        &nbsp;&nbsp;// runs once per object in the vector<br>
+        &nbsp;&nbsp;// obj is the current FallingObject<br>
+        }
+      </div>
+      <p style="margin-top:0.4rem;"><code>auto</code> - the compiler infers the type. Here it's <code>FallingObject</code>. You could write <code>FallingObject&amp;</code> instead -- same result.</p>
+      <p style="margin-top:0.4rem;"><code>&amp;</code> - reference. Without it, <code>obj</code> is a copy and changes inside the loop are thrown away. With <code>&amp;</code>, changes to <code>obj</code> affect the actual object in the vector.</p>
+      <p style="margin-top:0.4rem;"><code>:</code> - reads as "in". The whole line reads: for each obj in fallingObjects.</p>
+    </div>
+
     <div class="step-list" style="margin-top:0;">
       <div class="step">
         <div class="step-num">4</div>
         <div class="step-body">
           <strong>Make it a <code>std::vector</code> of objects <span class="step-badge badge-new">new</span></strong>
-          <span>Move your falling object into a struct (see above). Create a <code>std::vector</code> of them. Spawn a new one on a timer. Loop through the vector to update and draw each one. Remove objects that exit the screen bottom using the erase-remove pattern - covered in companion doc section 02.</span>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.3rem;">Move your falling object into a struct (see callout above). Create a <code>std::vector</code> of them. Spawn a new one on a timer. The vector needs two separate passes -- one in UPDATE, one in DRAW. Don't combine them.</p>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;"><strong style="color:var(--text);">UPDATE</strong> -- move each object, then remove the ones that have left the screen:</p>
+          <div style="background:#11141e; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin:0.4rem 0; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim); line-height:1.8;">
+            for (auto&amp; obj : fallingObjects) {<br>
+            &nbsp;&nbsp;obj.y += obj.speed * GetFrameTime();<br>
+            }<br>
+            // erase-remove off-screen objects here -- companion section 02
+          </div>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;"><strong style="color:var(--text);">DRAW</strong> -- render each object's current position:</p>
+          <div style="background:#11141e; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin:0.4rem 0; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim); line-height:1.8;">
+            for (auto&amp; obj : fallingObjects) {<br>
+            &nbsp;&nbsp;DrawRectangle((int)obj.x, (int)obj.y, (int)obj.width, (int)obj.height, RED);<br>
+            }
+          </div>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;"><code>DrawRectangle</code> takes <code>int</code> parameters. Your struct stores <code>float</code> values. The <code>(int)</code> cast converts them -- without it, the compiler will warn you about a possible loss of precision. Keeping UPDATE and DRAW separate means draw calls always reflect fully updated state. Mixing them works now and causes subtle bugs later.</p>
         </div>
       </div>
     </div>
 
     <div class="callout accent" style="margin: 1.25rem 0;">
       <div class="callout-title"><div class="icon icon-blue">→</div> The Rectangle type and CheckCollisionRecs</div>
-      <p>Raylib's <code>CheckCollisionRecs()</code> takes two <code>Rectangle</code> structs -- not individual x, y, width, height variables. A <code>Rectangle</code> is just those four values bundled together.</p>
-      <p style="margin-top:0.6rem;">Construct one from your variables like this:</p>
+      <p><code>CheckCollisionRecs()</code> takes two <code>Rectangle</code> structs -- not individual x, y, width, height variables. <code>player</code> is already a <code>Rectangle</code>, so you pass it directly. Your falling objects store their data as individual floats in the struct, so construct a <code>Rectangle</code> from them inline:</p>
       <div style="background:#11141e; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin:0.6rem 0; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim); line-height:1.8;">
-        Rectangle playerRect = { player.x, player.y, player.width, player.height };
+        for (auto&amp; obj : fallingObjects) {<br>
+        &nbsp;&nbsp;Rectangle objRect = { obj.x, obj.y, obj.width, obj.height };<br>
+        &nbsp;&nbsp;if (CheckCollisionRecs(player, objRect)) {<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;state = GameState::GameOver;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;break;<br>
+        &nbsp;&nbsp;}<br>
+        }
       </div>
-      <p>Do the same for each falling object, then pass both to <code>CheckCollisionRecs()</code>. It returns <code>true</code> if they overlap.</p>
+      <p><code>break</code> exits the loop on the first collision -- no point checking remaining objects once the game is already over. This goes in UPDATE, inside your <code>GameState::Playing</code> block.</p>
     </div>
 
     <div class="step-list" style="margin-top:0;">
@@ -679,7 +736,22 @@
         <div class="step-num">6</div>
         <div class="step-body">
           <strong>Add game state + score <span class="step-badge badge-new">new</span></strong>
-          <span>Implement the enum from above. In <code>Playing</code>: increment a score counter each frame (or each object dodged). In <code>GameOver</code>: draw the score and "press R to restart." On restart: call <code>fallingObjects.clear()</code> to empty the vector, reset score, reset player position, switch state back to <code>Playing</code>.</span>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.3rem;">Implement the enum from above. Declare <code>score</code> with the rest of your variables:</p>
+          <div style="background:#11141e; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin:0.4rem 0; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim); line-height:1.8;">
+            int score = 0;
+          </div>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;">Type: <code>int</code> -- scores are whole numbers. Initial value: <code>0</code> -- reset this on restart.</p>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;">In UPDATE, inside <code>GameState::Playing</code>, increment the score each frame (or each object dodged):</p>
+          <div style="background:#11141e; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin:0.4rem 0; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim); line-height:1.8;">
+            score++;
+          </div>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;"><code>score++</code> is shorthand for <code>score = score + 1</code>.</p>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;">Displaying the score requires a type conversion. <code>DrawText</code> expects a <code>const char*</code> -- a string of characters. <code>score</code> is an <code>int</code>. <code>TextFormat</code> is Raylib's converter:</p>
+          <div style="background:#11141e; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin:0.4rem 0; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim); line-height:1.8;">
+            DrawText(TextFormat("Score: %d", score), 10, 10, 20, WHITE);
+          </div>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;"><code>%d</code> is a placeholder for an integer. <code>TextFormat</code> slots <code>score</code> into it and returns a <code>const char*</code> ready for <code>DrawText</code>. This goes in DRAW -- you're rendering the current value of <code>score</code>, not changing it.</p>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;">In <code>GameState::GameOver</code>: draw the final score and "press R to restart." On restart: call <code>fallingObjects.clear()</code>, reset score to 0, reset player position, switch state back to <code>Playing</code>.</p>
         </div>
       </div>
       <div class="step">
