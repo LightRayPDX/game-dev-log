@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Raylib Reference</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Sora:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #0f1117;
+    --surface: #181c27;
+    --surface2: #1e2334;
+    --border: #2a3050;
+    --accent: #5b8cff;
+    --accent2: #3dffc0;
+    --warn: #ffc46b;
+    --muted: #6b7a99;
+    --text: #dde3f5;
+    --text-dim: #8a93b0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    padding: 2rem 1rem 4rem;
+  }
+
+  .page { max-width: 760px; margin: 0 auto; }
+
+  .header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: #5b8cff18;
+    color: var(--accent);
+    border: 1px solid #5b8cff40;
+    border-radius: 4px;
+    padding: 3px 10px;
+    margin-bottom: 1rem;
+  }
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #fff;
+    line-height: 1.2;
+    margin-bottom: 0.4rem;
+  }
+
+  .subtitle { color: var(--text-dim); font-size: 14px; }
+
+  /* Module sections */
+  .module { margin-bottom: 2.5rem; }
+
+  .module-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .module-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  .module-desc {
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  /* Function entries */
+  .fn-entry {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 0.75rem;
+    overflow: hidden;
+  }
+
+  .fn-top {
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    transition: background 0.15s;
+  }
+
+  .fn-top:hover { background: var(--surface2); }
+  .fn-top.open { background: var(--surface2); }
+
+  .fn-sig-block { flex: 1; }
+
+  .fn-sig {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    margin-bottom: 4px;
+    line-height: 1.5;
+  }
+
+  .fn-name { color: var(--accent2); font-weight: 600; }
+  .fn-params { color: var(--text-dim); }
+  .fn-returns { color: var(--warn); }
+
+  .fn-brief {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+
+  .fn-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .build-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--accent2);
+    background: #3dffc015;
+    border: 1px solid #3dffc030;
+    border-radius: 3px;
+    padding: 2px 6px;
+    white-space: nowrap;
+  }
+
+  .fn-toggle {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    transition: transform 0.2s;
+  }
+
+  .fn-top.open .fn-toggle { transform: rotate(90deg); }
+
+  /* Expanded body */
+  .fn-body {
+    display: none;
+    padding: 1rem 1.25rem;
+    border-top: 1px solid var(--border);
+    background: #0d1018;
+  }
+
+  .fn-body.open { display: block; }
+
+  .fn-section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.4rem;
+    margin-top: 0.75rem;
+  }
+
+  .fn-section-label:first-child { margin-top: 0; }
+
+  .param-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .param-row {
+    display: flex;
+    gap: 1rem;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .param-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--accent2);
+    min-width: 130px;
+    flex-shrink: 0;
+  }
+
+  .param-desc { color: var(--text-dim); }
+
+  .fn-example-block {
+    background: #11141e;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text);
+    line-height: 1.6;
+    overflow-x: auto;
+  }
+
+  .comment { color: #4a5470; }
+  .kw { color: #8ba4ff; }
+  .fn-call { color: #3dffc0; }
+  .str { color: #ffd080; }
+  .num { color: #ff9f7a; }
+  .type { color: #c8a6ff; }
+
+  .fn-note {
+    font-size: 12px;
+    color: var(--text-dim);
+    background: #5b8cff08;
+    border: 1px solid #5b8cff20;
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    margin-top: 0.5rem;
+  }
+
+  .fn-note strong { color: var(--accent); }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    background: #ffffff10;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 6px;
+    color: var(--accent2);
+  }
+
+  .official-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    text-decoration: none;
+    margin-top: 0.75rem;
+  }
+
+  .official-link:hover { color: var(--accent); }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+
+  /* TOC */
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 2rem;
+  }
+
+  .toc-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+  }
+
+  .toc a {
+    display: block;
+    font-size: 13px;
+    color: var(--text-dim);
+    text-decoration: none;
+    padding: 2px 0;
+  }
+
+  .toc a:hover { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="tag">Living Document</div>
+    <h1>Raylib Reference</h1>
+    <p class="subtitle">Functions introduced across builds. Organized by Raylib module. Each entry shows what the function does, what its parameters mean, and how to call it.</p>
+  </div>
+
+  <div class="toc">
+    <div class="toc-title">Modules</div>
+    <a href="#rcore-window">rcore - window &amp; timing</a>
+    <a href="#rcore-drawing">rcore - drawing</a>
+    <a href="#rshapes">rshapes - shapes</a>
+  </div>
+
+
+  <!-- RCORE WINDOW -->
+  <div class="module" id="rcore-window">
+    <div class="module-header">
+      <span class="module-name">rcore</span>
+      <span class="module-desc">window, input, and timing</span>
+    </div>
+
+    <!-- InitWindow -->
+    <div class="fn-entry">
+      <div class="fn-top" onclick="toggleFn(this)">
+        <div class="fn-sig-block">
+          <div class="fn-sig"><span class="fn-name">InitWindow</span><span class="fn-params">(int width, int height, const char *title)</span></div>
+          <div class="fn-brief">Opens the game window. Call this before anything else in main.</div>
+        </div>
+        <div class="fn-meta">
+          <span class="build-tag">Build 01</span>
+          <span class="fn-toggle">▶</span>
+        </div>
+      </div>
+      <div class="fn-body">
+        <div class="fn-section-label">Parameters</div>
+        <div class="param-list">
+          <div class="param-row"><span class="param-name">width</span><span class="param-desc">window width in pixels</span></div>
+          <div class="param-row"><span class="param-name">height</span><span class="param-desc">window height in pixels</span></div>
+          <div class="param-row"><span class="param-name">title</span><span class="param-desc">text shown in the window title bar</span></div>
+        </div>
+        <div class="fn-section-label">Example</div>
+        <div class="fn-example-block"><span class="fn-call">InitWindow</span>(<span class="num">800</span>, <span class="num">600</span>, <span class="str">"Something Moves"</span>);</div>
+        <a class="official-link" href="https://www.raylib.com/cheatsheet/cheatsheet.html#InitWindow" target="_blank">↗ official docs</a>
+      </div>
+    </div>
+
+    <!-- CloseWindow -->
+    <div class="fn-entry">
+      <div class="fn-top" onclick="toggleFn(this)">
+        <div class="fn-sig-block">
+          <div class="fn-sig"><span class="fn-name">CloseWindow</span><span class="fn-params">()</span></div>
+          <div class="fn-brief">Closes the window and frees resources. Call at the end of main, after the game loop.</div>
+        </div>
+        <div class="fn-meta">
+          <span class="build-tag">Build 01</span>
+          <span class="fn-toggle">▶</span>
+        </div>
+      </div>
+      <div class="fn-body">
+        <div class="fn-section-label">Parameters</div>
+        <div class="param-list">
+          <div class="param-row"><span class="param-name">(none)</span><span class="param-desc"></span></div>
+        </div>
+        <div class="fn-section-label">Example</div>
+        <div class="fn-example-block"><span class="fn-call">CloseWindow</span>();</div>
+        <a class="official-link" href="https://www.raylib.com/cheatsheet/cheatsheet.html#CloseWindow" target="_blank">↗ official docs</a>
+      </div>
+    </div>
+
+    <!-- WindowShouldClose -->
+    <div class="fn-entry">
+      <div class="fn-top" onclick="toggleFn(this)">
+        <div class="fn-sig-block">
+          <div class="fn-sig"><span class="fn-name">WindowShouldClose</span><span class="fn-params">()</span> <span class="fn-returns">→ bool</span></div>
+          <div class="fn-brief">Returns true when the user closes the window or presses Escape. Used as the game loop condition.</div>
+        </div>
+        <div class="fn-meta">
+          <span class="build-tag">Build 01</span>
+          <span class="fn-toggle">▶</span>
+        </div>
+      </div>
+      <div class="fn-body">
+        <div class="fn-section-label">Parameters</div>
+        <div class="param-list">
+          <div class="param-row"><span class="param-name">(none)</span><span class="param-desc"></span></div>
+        </div>
+        <div class="fn-section-label">Example</div>
+        <div class="fn-example-block"><span class="kw">while</span> (!<span class="fn-call">WindowShouldClose</span>()) {
+    <span class="comment">// game loop here</span>
+}</div>
+        <a class="official-link" href="https://www.raylib.com/cheatsheet/cheatsheet.html#WindowShouldClose" target="_blank">↗ official docs</a>
+      </div>
+    </div>
+
+    <!-- SetTargetFPS -->
+    <div class="fn-entry">
+      <div class="fn-top" onclick="toggleFn(this)">
+        <div class="fn-sig-block">
+          <div class="fn-sig"><span class="fn-name">SetTargetFPS</span><span class="fn-params">(int fps)</span></div>
+          <div class="fn-brief">Caps the frame rate. Without this the game runs as fast as the hardware allows.</div>
+        </div>
+        <div class="fn-meta">
+          <span class="build-tag">Build 01</span>
+          <span class="fn-toggle">▶</span>
+        </div>
+      </div>
+      <div class="fn-body">
+        <div class="fn-section-label">Parameters</div>
+        <div class="param-list">
+          <div class="param-row"><span class="param-name">fps</span><span class="param-desc">target frames per second - 60 is standard</span></div>
+        </div>
+        <div class="fn-section-label">Example</div>
+        <div class="fn-example-block"><span class="fn-call">SetTargetFPS</span>(<span class="num">60</span>);</div>
+        <a class="official-link" href="https://www.raylib.com/cheatsheet/cheatsheet.html#SetTargetFPS" target="_blank">↗ official docs</a>
+      </div>
+    </div>
+
+    <!-- GetFrameTime -->
+    <div class="fn-entry">
+      <div class="fn-top" onclick="toggleFn(this)">
+        <div class="fn-sig-block">
+          <div class="fn-sig"><span class="fn-name">GetFrameTime</span><span class="fn-params">()</span> <span class="fn-returns">→ float</span></div>
+          <div class="fn-brief">Returns the time in seconds since the last frame. Multiply velocity by this to make movement frame-rate independent.</div>
+        </div>
+        <div class="fn-meta">
+          <span class="build-tag">Build 01</span>
+          <span class="fn-toggle">▶</span>
+        </div>
+      </div>
+      <div class="fn-body">
+        <div class="fn-section-label">Parameters</div>
+        <div class="param-list">
+          <div class="param-row"><span class="param-name">(none)</span><span class="param-desc"></span></div>
+        </div>
+        <div class="fn-section-label">Example</div>
+        <div class="fn-example-block"><span class="type">float</span> dt = <span class="fn-call">GetFrameTime</span>();
+x += speed * dt; <span class="comment">// move independent of frame rate</span></div>
+        <div class="fn-note"><strong>Why this matters:</strong> Without delta time, your game runs faster on a faster machine. Multiplying by GetFrameTime() makes sure 200 pixels/second means the same thing on every computer.</div>
+        <a class="official-link" href="https://www.raylib.com/cheatsheet/cheatsheet.html#GetFrameTime" target="_blank">↗ official docs</a>
+      </div>
+    </div>
+
+    <!-- GetScreenWidth -->
+    <div class="fn-entry">
+      <div class="fn-top" onclick="toggleFn(this)">
+        <div class="fn-sig-block">
+          <div class="fn-sig"><span class="fn-name">GetScreenWidth</span><span class="fn-params">()</span> <span class="fn-returns">→ int</span></div>
+          <div class="fn-brief">Returns the window width in pixels. Use for boundary checks instead of hardcoding a number.</div>
+        </div>
+        <div class="fn-meta">
+          <span class="build-tag">Build 01</span>
+          <span class="fn-toggle">▶</span>
+        </div>
+      </div>
+      <div class="fn-body">
+        <div class="fn-section-label">Parameters</div>
+        <div class="param-list">
+          <div class="param-row"><span class="param-name">(none)</span><span class="param-desc"></span></div>
+        </div>
+        <div class="fn-section-label">Example</div>
+        <div class="fn-example-block"><span class="kw">if</span> (x + radius >= <span class="fn-call">GetScreenWidth</span>()) velocityX *= <span class="num">-1</span>;</div>
+        <a class="official-link" href="https://www.raylib.com/cheatsheet/cheatsheet.html#GetScreenWidth" target="_blank">↗ official docs</a>
+      </div>
+    </div>
+
+    <!-- GetScreenHeight -->
+    <div class="fn-entry">
+      <div class="fn-top" onclick="toggleFn(this)">
+        <div class="fn-sig-block">
+          <div class="fn-sig"><span class="fn-name">GetScreenHeight</span><span class="fn-params">()</span> <span class="fn-returns">→ int</span></div>
+          <div class="fn-brief">Returns the window height in pixels.</div>
+        </div>
+        <div class="fn-meta">
+          <span class="build-tag">Build 01</span>
+          <span class="fn-toggle">▶</span>
+        </div>
+      </div>
+      <div class="fn-body">
+        <div class="fn-section-label">Parameters</div>
+        <div class="param-list">
+          <div class="param-row"><span class="param-name">(none)</span><span class="param-desc"></span></div>
+        </div>
+        <div class="fn-section-label">Example</div>
+        <div class="fn-example-block"><span class="kw">if</span> (y + radius >= <span class="fn-call">GetScreenHeight</span>()) velocityY *= <span class="num">-1</span>;</div>
+        <a class="official-link" href="https://www.raylib.com/cheatsheet/cheatsheet.html#GetScreenHeight" target="_blank">↗ official docs</a>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- RCORE DRAWING -->
+  <div class="module" id="rcore-drawing">
+    <div class="module-header">
+      <span class="module-name">rcore</span>
+      <span class="module-desc">drawing setup</span>
+    </div>
+
+    <!-- BeginDrawing -->
+    <div class="fn-entry">
+      <div class="fn-top" onclick="toggleFn(this)">
+        <div class="fn-sig-block">
+          <div class="fn-sig"><span class="fn-name">BeginDrawing</span><span class="fn-params">()</span></div>
+          <div class="fn-brief">Starts the drawing phase for the current frame. Everything drawn goes between this and EndDrawing.</div>
+        </div>
+        <div class="fn-meta">
+          <span class="build-tag">Build 01</span>
+          <span class="fn-toggle">▶</span>
+        </div>
+      </div>
+      <div class="fn-body">
+        <div class="fn-section-label">Parameters</div>
+        <div class="param-list">
+          <div class="param-row"><span class="param-name">(none)</span><span class="param-desc"></span></div>
+        </div>
+        <div class="fn-section-label">Example</div>
+        <div class="fn-example-block"><span class="fn-call">BeginDrawing</span>();
+    <span class="fn-call">ClearBackground</span>(BLACK);
+    <span class="comment">// draw your game here</span>
+<span class="fn-call">EndDrawing</span>();</div>
+        <a class="official-link" href="https://www.raylib.com/cheatsheet/cheatsheet.html#BeginDrawing" target="_blank">↗ official docs</a>
+      </div>
+    </div>
+
+    <!-- EndDrawing -->
+    <div class="fn-entry">
+      <div class="fn-top" onclick="toggleFn(this)">
+        <div class="fn-sig-block">
+          <div class="fn-sig"><span class="fn-name">EndDrawing</span><span class="fn-params">()</span></div>
+          <div class="fn-brief">Ends the drawing phase and pushes the completed frame to the screen.</div>
+        </div>
+        <div class="fn-meta">
+          <span class="build-tag">Build 01</span>
+          <span class="fn-toggle">▶</span>
+        </div>
+      </div>
+      <div class="fn-body">
+        <div class="fn-section-label">Parameters</div>
+        <div class="param-list">
+          <div class="param-row"><span class="param-name">(none)</span><span class="param-desc"></span></div>
+        </div>
+        <div class="fn-section-label">Example</div>
+        <div class="fn-example-block"><span class="fn-call">BeginDrawing</span>();
+    <span class="comment">// draw here</span>
+<span class="fn-call">EndDrawing</span>(); <span class="comment">// frame appears on screen</span></div>
+        <a class="official-link" href="https://www.raylib.com/cheatsheet/cheatsheet.html#EndDrawing" target="_blank">↗ official docs</a>
+      </div>
+    </div>
+
+    <!-- ClearBackground -->
+    <div class="fn-entry">
+      <div class="fn-top" onclick="toggleFn(this)">
+        <div class="fn-sig-block">
+          <div class="fn-sig"><span class="fn-name">ClearBackground</span><span class="fn-params">(Color color)</span></div>
+          <div class="fn-brief">Fills the screen with a solid color. Call first inside BeginDrawing to wipe the previous frame.</div>
+        </div>
+        <div class="fn-meta">
+          <span class="build-tag">Build 01</span>
+          <span class="fn-toggle">▶</span>
+        </div>
+      </div>
+      <div class="fn-body">
+        <div class="fn-section-label">Parameters</div>
+        <div class="param-list">
+          <div class="param-row"><span class="param-name">color</span><span class="param-desc">the background color - use Raylib's named colors: BLACK, WHITE, RAYWHITE, DARKGRAY, etc.</span></div>
+        </div>
+        <div class="fn-section-label">Example</div>
+        <div class="fn-example-block"><span class="fn-call">ClearBackground</span>(BLACK);</div>
+        <div class="fn-note"><strong>Why this matters:</strong> Without ClearBackground, each frame draws on top of the last one. Your ball leaves a trail instead of appearing to move.</div>
+        <a class="official-link" href="https://www.raylib.com/cheatsheet/cheatsheet.html#ClearBackground" target="_blank">↗ official docs</a>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- RSHAPES -->
+  <div class="module" id="rshapes">
+    <div class="module-header">
+      <span class="module-name">rshapes</span>
+      <span class="module-desc">drawing basic shapes</span>
+    </div>
+
+    <!-- DrawCircle -->
+    <div class="fn-entry">
+      <div class="fn-top" onclick="toggleFn(this)">
+        <div class="fn-sig-block">
+          <div class="fn-sig"><span class="fn-name">DrawCircle</span><span class="fn-params">(int centerX, int centerY, float radius, Color color)</span></div>
+          <div class="fn-brief">Draws a filled circle at a given position.</div>
+        </div>
+        <div class="fn-meta">
+          <span class="build-tag">Build 01</span>
+          <span class="fn-toggle">▶</span>
+        </div>
+      </div>
+      <div class="fn-body">
+        <div class="fn-section-label">Parameters</div>
+        <div class="param-list">
+          <div class="param-row"><span class="param-name">centerX</span><span class="param-desc">horizontal center position in pixels - 0 is the left edge of the window</span></div>
+          <div class="param-row"><span class="param-name">centerY</span><span class="param-desc">vertical center position in pixels - 0 is the top edge of the window</span></div>
+          <div class="param-row"><span class="param-name">radius</span><span class="param-desc">radius of the circle in pixels</span></div>
+          <div class="param-row"><span class="param-name">color</span><span class="param-desc">fill color - use named colors (RED, BLUE, GREEN) or define a custom Color</span></div>
+        </div>
+        <div class="fn-section-label">Example</div>
+        <div class="fn-example-block"><span class="fn-call">DrawCircle</span>(<span class="num">400</span>, <span class="num">300</span>, <span class="num">25.0f</span>, RED); <span class="comment">// circle at center of 800x600 window</span>
+<span class="fn-call">DrawCircle</span>((<span class="type">int</span>)x, (<span class="type">int</span>)y, radius, WHITE); <span class="comment">// using variables</span></div>
+        <div class="fn-note"><strong>Note:</strong> centerX and centerY are ints but your position variables will likely be floats. Cast them: <code>(int)x</code>.</div>
+        <a class="official-link" href="https://www.raylib.com/cheatsheet/cheatsheet.html#DrawCircle" target="_blank">↗ official docs</a>
+      </div>
+    </div>
+
+    <!-- DrawRectangle -->
+    <div class="fn-entry">
+      <div class="fn-top" onclick="toggleFn(this)">
+        <div class="fn-sig-block">
+          <div class="fn-sig"><span class="fn-name">DrawRectangle</span><span class="fn-params">(int posX, int posY, int width, int height, Color color)</span></div>
+          <div class="fn-brief">Draws a filled rectangle. posX and posY are the top-left corner.</div>
+        </div>
+        <div class="fn-meta">
+          <span class="build-tag">Build 01</span>
+          <span class="fn-toggle">▶</span>
+        </div>
+      </div>
+      <div class="fn-body">
+        <div class="fn-section-label">Parameters</div>
+        <div class="param-list">
+          <div class="param-row"><span class="param-name">posX</span><span class="param-desc">horizontal position of the top-left corner in pixels</span></div>
+          <div class="param-row"><span class="param-name">posY</span><span class="param-desc">vertical position of the top-left corner in pixels</span></div>
+          <div class="param-row"><span class="param-name">width</span><span class="param-desc">width of the rectangle in pixels</span></div>
+          <div class="param-row"><span class="param-name">height</span><span class="param-desc">height of the rectangle in pixels</span></div>
+          <div class="param-row"><span class="param-name">color</span><span class="param-desc">fill color</span></div>
+        </div>
+        <div class="fn-section-label">Example</div>
+        <div class="fn-example-block"><span class="fn-call">DrawRectangle</span>(<span class="num">100</span>, <span class="num">100</span>, <span class="num">50</span>, <span class="num">50</span>, BLUE); <span class="comment">// 50x50 blue square</span>
+<span class="fn-call">DrawRectangle</span>((<span class="type">int</span>)x, (<span class="type">int</span>)y, width, height, GREEN); <span class="comment">// using variables</span></div>
+        <a class="official-link" href="https://www.raylib.com/cheatsheet/cheatsheet.html#DrawRectangle" target="_blank">↗ official docs</a>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  function toggleFn(top) {
+    const body = top.nextElementSibling;
+    const toggle = top.querySelector('.fn-toggle');
+    const isOpen = body.classList.contains('open');
+    body.classList.toggle('open', !isOpen);
+    top.classList.toggle('open', !isOpen);
+  }
+</script>
+</body>
+</html>

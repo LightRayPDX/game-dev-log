@@ -368,6 +368,63 @@
     padding: 2px 8px;
     margin-bottom: 0.5rem;
   }
+
+  .fn-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .fn-group-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: #5b8cff10;
+    border: 1px solid #5b8cff25;
+    border-radius: 4px;
+    padding: 3px 8px;
+    margin-bottom: 0.5rem;
+    display: inline-block;
+  }
+
+  .fn-entry {
+    border-bottom: 1px solid var(--border);
+    padding: 0.75rem 0;
+  }
+
+  .fn-entry:last-child { border-bottom: none; }
+
+  .fn-sig {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    margin-bottom: 4px;
+  }
+
+  .fn-name { color: var(--accent2); font-weight: 600; }
+  .fn-params { color: var(--text-dim); }
+  .fn-returns { color: var(--warn); margin-left: 6px; }
+
+  .fn-desc {
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+    line-height: 1.5;
+  }
+
+  .fn-example {
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  .fn-ex-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    margin-right: 6px;
+  }
 </style>
 </head>
 <body>
@@ -429,18 +486,25 @@
   <section>
     <h2 class="section-label">Resources</h2>
     <div class="resource-row">
+      <a class="resource" href="../raylib_reference.html" target="_blank">
+        <div class="r-icon">📋</div>
+        <div class="r-body">
+          <strong>Raylib Reference</strong>
+          <span>Functions introduced across all builds, with descriptions and examples. Grows with you.</span>
+        </div>
+      </a>
       <a class="resource" href="https://www.raylib.com/cheatsheet/cheatsheet.html" target="_blank">
         <div class="r-icon">📋</div>
         <div class="r-body">
           <strong>Raylib Cheatsheet</strong>
-          <span>Pin this tab. Every function you'll need is on one page.</span>
+          <span>The full official library. Useful once you know what you're looking for.</span>
         </div>
       </a>
       <a class="resource" href="https://github.com/raysan5/raylib/wiki/Working-on-Windows" target="_blank">
         <div class="r-icon">🪟</div>
         <div class="r-body">
           <strong>Raylib Windows Setup Guide</strong>
-          <span>Official wiki. Compiler setup on Windows is annoying for everyone — if it takes two hours, that's normal.</span>
+          <span>Official wiki. Compiler setup on Windows is annoying for everyone - if it takes two hours, that's normal.</span>
         </div>
       </a>
       <a class="resource" href="https://www.learncpp.com" target="_blank">
@@ -450,6 +514,96 @@
           <span>You already know this one. Going forward, the build docs will point to specific sections that are relevant to what you're building rather than treating it as a course to follow.</span>
         </div>
       </a>
+    </div>
+  </section>
+
+
+  <!-- RAYLIB FUNCTIONS — collapsed -->
+  <section>
+    <div class="collapsible-header" onclick="toggleSection('functions')">
+      <h2>Raylib functions for this build</h2>
+      <span class="collapse-toggle" id="functions-toggle">show</span>
+    </div>
+    <div class="collapsible-body" id="functions">
+      <div class="fn-list">
+
+        <div class="fn-group-label">rcore - window</div>
+
+        <div class="fn-entry">
+          <div class="fn-sig"><span class="fn-name">InitWindow</span><span class="fn-params">(int width, int height, const char *title)</span></div>
+          <div class="fn-desc">Opens the game window. Call this first, before anything else.</div>
+          <div class="fn-example"><span class="fn-ex-label">e.g.</span> <code>InitWindow(800, 600, "Something Moves");</code></div>
+        </div>
+
+        <div class="fn-entry">
+          <div class="fn-sig"><span class="fn-name">CloseWindow</span><span class="fn-params">()</span></div>
+          <div class="fn-desc">Closes the window and frees resources. Call this at the end of main, after the game loop.</div>
+          <div class="fn-example"><span class="fn-ex-label">e.g.</span> <code>CloseWindow();</code></div>
+        </div>
+
+        <div class="fn-entry">
+          <div class="fn-sig"><span class="fn-name">WindowShouldClose</span><span class="fn-params">()</span> <span class="fn-returns">→ bool</span></div>
+          <div class="fn-desc">Returns true when the user clicks the close button or presses Escape. Used as the game loop condition.</div>
+          <div class="fn-example"><span class="fn-ex-label">e.g.</span> <code>while (!WindowShouldClose()) { ... }</code></div>
+        </div>
+
+        <div class="fn-entry">
+          <div class="fn-sig"><span class="fn-name">SetTargetFPS</span><span class="fn-params">(int fps)</span></div>
+          <div class="fn-desc">Caps the frame rate. 60 is standard. Without this, the game runs as fast as possible.</div>
+          <div class="fn-example"><span class="fn-ex-label">e.g.</span> <code>SetTargetFPS(60);</code></div>
+        </div>
+
+        <div class="fn-entry">
+          <div class="fn-sig"><span class="fn-name">GetFrameTime</span><span class="fn-params">()</span> <span class="fn-returns">→ float</span></div>
+          <div class="fn-desc">Returns the time in seconds since the last frame. Multiply velocity by this to make movement frame-rate independent.</div>
+          <div class="fn-example"><span class="fn-ex-label">e.g.</span> <code>float dt = GetFrameTime();</code> then <code>x += speed * dt;</code></div>
+        </div>
+
+        <div class="fn-entry">
+          <div class="fn-sig"><span class="fn-name">GetScreenWidth</span><span class="fn-params">()</span> <span class="fn-returns">→ int</span></div>
+          <div class="fn-desc">Returns the window width in pixels. Use for boundary checks instead of hardcoding 800.</div>
+          <div class="fn-example"><span class="fn-ex-label">e.g.</span> <code>if (x + radius >= GetScreenWidth()) velocityX *= -1;</code></div>
+        </div>
+
+        <div class="fn-entry">
+          <div class="fn-sig"><span class="fn-name">GetScreenHeight</span><span class="fn-params">()</span> <span class="fn-returns">→ int</span></div>
+          <div class="fn-desc">Returns the window height in pixels.</div>
+          <div class="fn-example"><span class="fn-ex-label">e.g.</span> <code>if (y + radius >= GetScreenHeight()) velocityY *= -1;</code></div>
+        </div>
+
+        <div class="fn-group-label" style="margin-top:1rem;">rcore - drawing</div>
+
+        <div class="fn-entry">
+          <div class="fn-sig"><span class="fn-name">BeginDrawing</span><span class="fn-params">()</span></div>
+          <div class="fn-desc">Starts the drawing phase for the current frame. Everything you draw goes between this and EndDrawing.</div>
+        </div>
+
+        <div class="fn-entry">
+          <div class="fn-sig"><span class="fn-name">EndDrawing</span><span class="fn-params">()</span></div>
+          <div class="fn-desc">Ends the drawing phase and pushes the frame to the screen.</div>
+        </div>
+
+        <div class="fn-entry">
+          <div class="fn-sig"><span class="fn-name">ClearBackground</span><span class="fn-params">(Color color)</span></div>
+          <div class="fn-desc">Fills the entire screen with a color. Call this first inside BeginDrawing to wipe the previous frame.</div>
+          <div class="fn-example"><span class="fn-ex-label">e.g.</span> <code>ClearBackground(BLACK);</code></div>
+        </div>
+
+        <div class="fn-group-label" style="margin-top:1rem;">rshapes - drawing</div>
+
+        <div class="fn-entry">
+          <div class="fn-sig"><span class="fn-name">DrawCircle</span><span class="fn-params">(int centerX, int centerY, float radius, Color color)</span></div>
+          <div class="fn-desc">Draws a filled circle. centerX and centerY are the center position in pixels from the top-left corner of the window.</div>
+          <div class="fn-example"><span class="fn-ex-label">e.g.</span> <code>DrawCircle(400, 300, 25.0f, RED);</code></div>
+        </div>
+
+        <div class="fn-entry">
+          <div class="fn-sig"><span class="fn-name">DrawRectangle</span><span class="fn-params">(int posX, int posY, int width, int height, Color color)</span></div>
+          <div class="fn-desc">Draws a filled rectangle. posX and posY are the top-left corner.</div>
+          <div class="fn-example"><span class="fn-ex-label">e.g.</span> <code>DrawRectangle(100, 100, 50, 50, BLUE);</code></div>
+        </div>
+
+      </div>
     </div>
   </section>
 
