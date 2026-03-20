@@ -659,6 +659,7 @@
         &nbsp;&nbsp;float speed;<br>
         };
       </div>
+      <p style="margin-top:0.4rem;">This goes above <code>main()</code>, before the game loop. Struct definitions are type declarations -- the compiler needs to know the type exists before you can use it anywhere in the file.</p>
       <p style="margin-top:0.6rem;"><strong>The spawn timer</strong> uses the same delta time pattern from Build 01 -- accumulate time each frame, trigger when enough has passed:</p>
       <div style="background:#11141e; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin:0.6rem 0; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim); line-height:1.8;">
         spawnTimer += dt;<br>
