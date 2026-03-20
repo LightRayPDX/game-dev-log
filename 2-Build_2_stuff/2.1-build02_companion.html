@@ -481,13 +481,11 @@
           </div>
           <div class="drill-body">
             <p><code>CheckCollisionRecs()</code> takes two <code>Rectangle</code> structs and returns a bool. A <code>Rectangle</code> in Raylib is a struct with four fields: <code>x</code>, <code>y</code>, <code>width</code>, <code>height</code> - all floats.</p>
-            <p>Your game objects likely store these as separate variables. Construct a <code>Rectangle</code> from them before passing to the function:</p>
-            <pre><code><span class="type">Rectangle</span> playerRect = { player.x, player.y, player.width, player.height };
-
-<span class="comment">// for (auto& obj : ...) is a range-based for loop -- covered in build doc step 4</span>
+            <p><code>player</code> is already a <code>Rectangle</code> -- pass it directly. Your falling objects store data as individual floats in the struct, so construct a <code>Rectangle</code> from them inline for each one:</p>
+            <pre><code><span class="comment">// for (auto& obj : ...) is a range-based for loop -- covered in build doc step 4</span>
 <span class="kw">for</span> (<span class="kw">auto</span>&amp; obj : fallingObjects) {
     <span class="type">Rectangle</span> objRect = { obj.x, obj.y, obj.width, obj.height };
-    <span class="kw">if</span> (<span class="fn">CheckCollisionRecs</span>(playerRect, objRect)) {
+    <span class="kw">if</span> (<span class="fn">CheckCollisionRecs</span>(player, objRect)) {
         state = <span class="type">GameState</span>::GameOver;
         <span class="kw">break</span>;
     }
@@ -515,7 +513,8 @@
         <div class="concept-toggle">▶</div>
       </div>
       <div class="concept-body">
-        <p>You've used <code>std::vector</code> before. In this build it's doing something slightly more interesting: you're <strong>adding objects during gameplay</strong> (spawning) and <strong>removing them</strong> when they leave the screen. That "remove while iterating" part is where most people hit a wall.</p>
+        <p><code>std::vector</code> is a list that can grow and shrink while your program runs. Unlike a plain array with a fixed size, a vector lets you add items during gameplay and remove them when they're no longer needed -- exactly what spawning and despawning falling objects requires.</p>
+        <p>In this build it's doing two things: you're <strong>adding objects</strong> on a timer (spawning) and <strong>removing them</strong> when they leave the screen. That removal-while-running part is where most people hit a wall.</p>
         <p>The problem: if you loop through a vector and delete items as you go, you mess up the loop's index tracking. The standard solution is the <strong>erase-remove idiom</strong> - a two-step pattern that C++ programmers use constantly.</p>
 
         <div class="drill">
@@ -538,6 +537,7 @@
           </div>
           <div class="drill-body">
             <p>The pattern is a two-step: first <strong>mark</strong> items for removal using <code>std::remove_if</code>, then <strong>actually erase</strong> them with <code>erase()</code>.</p>
+            <p>The syntax inside <code>remove_if</code> uses a <strong>lambda</strong> -- an anonymous function defined inline. You haven't used lambdas before; don't worry about the syntax for now. Read it as: "remove any object where this condition is true." The <code>[](const FallingObject&amp; obj)</code> part is just how you define the condition inline in C++.</p>
             <pre><code><span class="comment">// Remove all objects that have gone off the bottom of the screen</span>
 fallingObjects.<span class="fn">erase</span>(
     std::<span class="fn">remove_if</span>(fallingObjects.<span class="fn">begin</span>(), fallingObjects.<span class="fn">end</span>(),
