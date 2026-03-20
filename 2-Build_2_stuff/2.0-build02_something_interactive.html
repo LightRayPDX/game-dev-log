@@ -641,16 +641,38 @@
       <div class="step">
         <div class="step-num">3</div>
         <div class="step-body">
-          <strong>Spawn one falling object <span class="step-badge badge-new">new</span></strong>
-          <span>A single rectangle with a random x position at the top, falling at a fixed speed using the same velocity pattern from Build 01. Get it falling and disappearing when it hits the bottom before adding more.</span>
+          <strong>Get one falling object working <span class="step-badge badge-new">new</span></strong>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.3rem;">A single falling object needs position, size, and speed. Declare these before the game loop:</p>
+          <div style="background:#11141e; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin:0.4rem 0; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim); line-height:1.8;">
+            float objX = 400.0f;&nbsp;&nbsp;&nbsp;<span style="color:#4a5470;">// starting x -- you'll make this random in step 4</span><br>
+            float objY = -30.0f;&nbsp;&nbsp;&nbsp;<span style="color:#4a5470;">// start just above the top of the screen</span><br>
+            float objWidth = 30.0f;<br>
+            float objHeight = 30.0f;<br>
+            float objSpeed = 200.0f;&nbsp;&nbsp;<span style="color:#4a5470;">// pixels per second</span>
+          </div>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;">In UPDATE, move it down each frame:</p>
+          <div style="background:#11141e; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin:0.4rem 0; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim); line-height:1.8;">
+            objY += objSpeed * GetFrameTime();
+          </div>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;">When it passes the bottom of the screen, reset it to the top:</p>
+          <div style="background:#11141e; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin:0.4rem 0; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim); line-height:1.8;">
+            if (objY &gt; (float)GetScreenHeight()) objY = -30.0f;
+          </div>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;">In DRAW:</p>
+          <div style="background:#11141e; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin:0.4rem 0; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim); line-height:1.8;">
+            DrawRectangle((int)objX, (int)objY, (int)objWidth, (int)objHeight, RED);
+          </div>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;">Get this working before moving to step 4. One object falling and resetting is the foundation everything else builds on.</p>
         </div>
       </div>
     </div>
 
     <div class="callout accent" style="margin: 1.25rem 0;">
       <div class="callout-title"><div class="icon icon-blue">→</div> Structs and the spawn timer pattern</div>
-      <p>Step 4 introduces two things at once. Before you start, it's worth understanding each one.</p>
-      <p style="margin-top:0.6rem;"><strong>Structs</strong> bundle related variables into one named type. Instead of separate <code>objX</code>, <code>objY</code>, <code>objSpeed</code> variables, you define a struct once and create as many instances as you need:</p>
+      <p>Step 4 introduces two new things. Before you start, it's worth understanding each one.</p>
+
+      <p style="margin-top:0.75rem;"><strong>Structs</strong> are a way of grouping related variables under one name. You define the struct once, then create as many instances of it as you need -- each instance has its own copy of all the fields.</p>
+      <p style="margin-top:0.4rem;">Right now you have separate variables: <code>objX</code>, <code>objY</code>, <code>objSpeed</code>. A struct bundles all of those into one thing:</p>
       <div style="background:#11141e; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin:0.6rem 0; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim); line-height:1.8;">
         struct FallingObject {<br>
         &nbsp;&nbsp;float x, y;<br>
@@ -659,16 +681,31 @@
         &nbsp;&nbsp;float speed;<br>
         };
       </div>
-      <p style="margin-top:0.4rem;">This goes above <code>main()</code>, before the game loop. Struct definitions are type declarations -- the compiler needs to know the type exists before you can use it anywhere in the file.</p>
-      <p style="margin-top:0.6rem;"><strong>The spawn timer</strong> uses the same delta time pattern from Build 01 -- accumulate time each frame, trigger when enough has passed:</p>
+      <p style="margin-top:0.4rem;">Once defined, you create an instance and access its fields with dot notation:</p>
       <div style="background:#11141e; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin:0.6rem 0; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim); line-height:1.8;">
-        spawnTimer += dt;<br>
-        if (spawnTimer >= spawnInterval) {<br>
+        FallingObject obj;<br>
+        obj.x = 100.0f;<br>
+        obj.y = -30.0f;<br>
+        obj.speed = 200.0f;
+      </div>
+      <p style="margin-top:0.4rem;">The struct definition goes above <code>main()</code>, before the game loop. The compiler needs to know the type exists before you can use it anywhere in the file.</p>
+
+      <p style="margin-top:0.75rem;"><strong>The spawn timer</strong> is a new pattern. You can't use <code>sleep()</code> or similar to pause between spawns -- that would freeze the whole game. Instead, you accumulate delta time each frame and trigger a spawn once enough time has passed.</p>
+      <p style="margin-top:0.4rem;">Declare these before the game loop:</p>
+      <div style="background:#11141e; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin:0.6rem 0; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim); line-height:1.8;">
+        float spawnTimer = 0.0f;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#4a5470;">// tracks time since last spawn</span><br>
+        float spawnInterval = 1.5f;&nbsp;&nbsp;<span style="color:#4a5470;">// seconds between spawns</span>
+      </div>
+      <p style="margin-top:0.4rem;">In UPDATE, inside your Playing state:</p>
+      <div style="background:#11141e; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin:0.6rem 0; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim); line-height:1.8;">
+        spawnTimer += GetFrameTime();<br>
+        if (spawnTimer &gt;= spawnInterval) {<br>
         &nbsp;&nbsp;spawnTimer = 0.0f;<br>
-        &nbsp;&nbsp;// add a new object to the vector<br>
+        &nbsp;&nbsp;<span style="color:#4a5470;">// add a new object</span><br>
         }
       </div>
-      <p>The companion doc covers both in depth -- see sections 04 (Structs) and 05 (Spawning on a Timer).</p>
+      <p style="margin-top:0.4rem;"><code>GetFrameTime()</code> is the same delta time from Build 01 -- time since the last frame in seconds. Accumulated over many frames, it gives you elapsed real time. Adjust <code>spawnInterval</code> to change how frequently objects appear.</p>
+      <p style="margin-top:0.6rem;">The companion doc covers both in depth -- see sections 04 (Structs) and 05 (Spawning on a Timer).</p>
     </div>
 
     <div class="callout accent" style="margin: 1.25rem 0;">
