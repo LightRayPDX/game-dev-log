@@ -779,7 +779,7 @@
         &nbsp;&nbsp;}<br>
         }
       </div>
-      <p><code>break</code> exits the loop on the first collision -- no point checking remaining objects once the game is already over. This goes in UPDATE, inside your <code>GameState::Playing</code> block.</p>
+      <p><code>break</code> exits the loop on the first collision -- no point checking remaining objects once a hit is detected. This goes in UPDATE. In step 6 you'll wrap this in a <code>GameState::Playing</code> check -- for now, just get collisions detected and triggering something visible.</p>
     </div>
 
     <div class="step-list" style="margin-top:0;">
@@ -787,29 +787,66 @@
         <div class="step-num">5</div>
         <div class="step-body">
           <strong>Add AABB collision detection <span class="step-badge badge-new">new</span></strong>
-          <span>For each falling object, construct a <code>Rectangle</code> from its variables and check against the player rectangle using <code>CheckCollisionRecs()</code>. When a hit is detected, switch game state to <code>GameOver</code>.</span>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.3rem;">The callout above shows the full collision loop. This goes in UPDATE -- you're changing game state when a hit is detected, not drawing anything.</p>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;"><code>player</code> is already a <code>Rectangle</code> so it passes directly. Each falling object's data is in your struct's float fields, so you construct a <code>Rectangle</code> from them inline for each one.</p>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;">For now, get collisions detected and triggering something visible -- a printed message, a color change, anything. Step 6 wraps everything in proper game state checks.</p>
         </div>
       </div>
       <div class="step">
         <div class="step-num">6</div>
         <div class="step-body">
           <strong>Add game state + score <span class="step-badge badge-new">new</span></strong>
-          <p style="font-size:13px; color:var(--text-dim); margin-top:0.3rem;">Implement the enum from above. Declare <code>score</code> with the rest of your variables:</p>
+
+          <p style="font-size:13px; color:var(--text); margin-top:0.5rem; margin-bottom:0.2rem;"><strong>Game state</strong></p>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.3rem;">The enum from the state machine section needs to go in your actual code. Declare it at file scope, above <code>main()</code> -- the same place as your struct:</p>
+          <div style="background:#11141e; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin:0.4rem 0; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim); line-height:1.8;">
+            enum class GameState { Playing, GameOver };<br>
+            GameState state = GameState::Playing;
+          </div>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;">In your game loop, wrap all UPDATE logic in a state check:</p>
+          <div style="background:#11141e; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin:0.4rem 0; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim); line-height:1.8;">
+            if (state == GameState::Playing) {<br>
+            &nbsp;&nbsp;<span style="color:#4a5470;">// move player, move objects, check collisions, update score</span><br>
+            }
+          </div>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;">And DRAW:</p>
+          <div style="background:#11141e; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin:0.4rem 0; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim); line-height:1.8;">
+            if (state == GameState::Playing) {<br>
+            &nbsp;&nbsp;<span style="color:#4a5470;">// draw player, draw objects, draw score</span><br>
+            } else if (state == GameState::GameOver) {<br>
+            &nbsp;&nbsp;<span style="color:#4a5470;">// draw game over text and final score</span><br>
+            }
+          </div>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;">For restart, check for the R key in your <code>GameOver</code> UPDATE block:</p>
+          <div style="background:#11141e; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin:0.4rem 0; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim); line-height:1.8;">
+            if (state == GameState::GameOver) {<br>
+            &nbsp;&nbsp;if (IsKeyDown(KEY_R)) {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;fallingObjects.clear();&nbsp;&nbsp;<span style="color:#4a5470;">// empties the vector</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;score = 0;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;player.x = <span style="color:#4a5470;">// reset to starting x</span>;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;player.y = <span style="color:#4a5470;">// reset to starting y</span>;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;state = GameState::Playing;<br>
+            &nbsp;&nbsp;}<br>
+            }
+          </div>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;"><code>fallingObjects.clear()</code> removes all elements from the vector, leaving it empty. <code>score</code> and player position reset manually.</p>
+
+          <p style="font-size:13px; color:var(--text); margin-top:0.75rem; margin-bottom:0.2rem;"><strong>Score</strong></p>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.3rem;">Declare <code>score</code> before the game loop:</p>
           <div style="background:#11141e; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin:0.4rem 0; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim); line-height:1.8;">
             int score = 0;
           </div>
           <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;">Type: <code>int</code> -- scores are whole numbers. Initial value: <code>0</code> -- reset this on restart.</p>
-          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;">In UPDATE, inside <code>GameState::Playing</code>, increment the score each frame (or each object dodged):</p>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;">In UPDATE, inside <code>GameState::Playing</code>, increment each frame:</p>
           <div style="background:#11141e; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin:0.4rem 0; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim); line-height:1.8;">
             score++;
           </div>
           <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;"><code>score++</code> is shorthand for <code>score = score + 1</code>.</p>
-          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;">Displaying the score requires a type conversion. <code>DrawText</code> expects a <code>const char*</code> -- a string of characters. <code>score</code> is an <code>int</code>. <code>TextFormat</code> is Raylib's converter:</p>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;">In DRAW, inside <code>GameState::Playing</code>:</p>
           <div style="background:#11141e; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin:0.4rem 0; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim); line-height:1.8;">
             DrawText(TextFormat("Score: %d", score), 10, 10, 20, WHITE);
           </div>
-          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;"><code>%d</code> is a placeholder for an integer. <code>TextFormat</code> slots <code>score</code> into it and returns a <code>const char*</code> ready for <code>DrawText</code>. This goes in DRAW -- you're rendering the current value of <code>score</code>, not changing it.</p>
-          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;">In <code>GameState::GameOver</code>: draw the final score and "press R to restart." On restart: call <code>fallingObjects.clear()</code>, reset score to 0, reset player position, switch state back to <code>Playing</code>.</p>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;"><code>DrawText</code> expects a <code>const char*</code>. <code>score</code> is an <code>int</code>. <code>TextFormat</code> converts it -- <code>%d</code> is a placeholder for an integer. In <code>GameState::GameOver</code>, draw the final score the same way.</p>
         </div>
       </div>
       <div class="step">
