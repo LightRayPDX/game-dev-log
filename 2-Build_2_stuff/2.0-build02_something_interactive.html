@@ -710,8 +710,8 @@
 
     <div class="callout accent" style="margin: 1.25rem 0;">
       <div class="callout-title"><div class="icon icon-blue">→</div> For loops and iterating over a vector</div>
-      <p>A <strong>for loop</strong> runs a block of code once for each element in a collection. With a vector of falling objects, a for loop is how you visit each one in turn.</p>
-      <p style="margin-top:0.6rem;">The range-based form handles the indexing for you:</p>
+      <p>Step 4 uses a for loop to visit every object in the vector -- moving each one in UPDATE, drawing each one in DRAW. Here's how that works.</p>
+      <p style="margin-top:0.6rem;">A <strong>for loop</strong> runs a block of code once for each element in a collection. The range-based form handles the indexing for you:</p>
       <div style="background:#11141e; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin:0.6rem 0; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim); line-height:1.8;">
         for (auto&amp; obj : fallingObjects) {<br>
         &nbsp;&nbsp;// runs once per object in the vector<br>
@@ -727,14 +727,34 @@
       <div class="step">
         <div class="step-num">4</div>
         <div class="step-body">
-          <strong>Make it a <code>std::vector</code> of objects <span class="step-badge badge-new">new</span></strong>
-          <p style="font-size:13px; color:var(--text-dim); margin-top:0.3rem;">Move your falling object into a struct (see callout above). Create a <code>std::vector</code> of them. Spawn a new one on a timer. The vector needs two separate passes -- one in UPDATE, one in DRAW. Don't combine them.</p>
-          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;"><strong style="color:var(--text);">UPDATE</strong> -- move each object, then remove the ones that have left the screen:</p>
+          <strong>Manage multiple falling objects <span class="step-badge badge-new">new</span></strong>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.3rem;">Step 3 gave you one falling object with five separate variables. That works for one -- but you need many, and declaring five new variables for every object isn't a solution.</p>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;">The answer is two things used together: a <strong style="color:var(--text);">struct</strong> to bundle one object's variables into a single named thing (see callout above), and a <strong style="color:var(--text);">std::vector</strong> to hold as many of those structs as you need at once.</p>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;"><code>std::vector</code> is a list that can grow and shrink while the program runs. You can add objects to it, loop through all of them, and remove the ones you don't need. Include it at the top of your file:</p>
+          <div style="background:#11141e; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin:0.4rem 0; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim); line-height:1.8;">
+            #include &lt;vector&gt;
+          </div>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;">Declare the vector before the game loop:</p>
+          <div style="background:#11141e; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin:0.4rem 0; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim); line-height:1.8;">
+            std::vector&lt;FallingObject&gt; fallingObjects;
+          </div>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;"><code>std::vector&lt;FallingObject&gt;</code> means: a vector that holds <code>FallingObject</code> structs. It starts empty. Add a new object using <code>push_back</code> inside your spawn timer block:</p>
+          <div style="background:#11141e; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin:0.4rem 0; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim); line-height:1.8;">
+            <span style="color:#4a5470;">// GetRandomValue(min, max) returns a random int between those values, inclusive.</span><br>
+            <span style="color:#4a5470;">// Subtracting 30 from the right edge stops objects spawning partially off screen.</span><br>
+            FallingObject obj;<br>
+            obj.x = (float)GetRandomValue(0, GetScreenWidth() - 30);<br>
+            obj.y = -30.0f;<br>
+            obj.speed = 200.0f;<br>
+            fallingObjects.push_back(obj);
+          </div>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;">The vector needs two separate passes -- one in UPDATE, one in DRAW. Don't combine them.</p>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;"><strong style="color:var(--text);">UPDATE</strong> -- move each object down, then remove any that have left the screen:</p>
           <div style="background:#11141e; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin:0.4rem 0; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim); line-height:1.8;">
             for (auto&amp; obj : fallingObjects) {<br>
             &nbsp;&nbsp;obj.y += obj.speed * GetFrameTime();<br>
             }<br>
-            // erase-remove off-screen objects here -- companion section 02
+            <span style="color:#4a5470;">// erase-remove off-screen objects here -- companion section 02</span>
           </div>
           <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;"><strong style="color:var(--text);">DRAW</strong> -- render each object's current position:</p>
           <div style="background:#11141e; border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; margin:0.4rem 0; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim); line-height:1.8;">
@@ -742,7 +762,7 @@
             &nbsp;&nbsp;DrawRectangle((int)obj.x, (int)obj.y, (int)obj.width, (int)obj.height, RED);<br>
             }
           </div>
-          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;"><code>DrawRectangle</code> takes <code>int</code> parameters. Your struct stores <code>float</code> values. The <code>(int)</code> cast converts them -- without it, the compiler will warn you about a possible loss of precision. Keeping UPDATE and DRAW separate means draw calls always reflect fully updated state. Mixing them works now and causes subtle bugs later.</p>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;"><code>DrawRectangle</code> takes <code>int</code> parameters. Your struct stores <code>float</code> values. The <code>(int)</code> cast converts them -- without it the compiler will warn you about a possible loss of precision. Keeping UPDATE and DRAW as separate loops means draw calls always reflect fully updated state. Mixing them works now and causes subtle bugs later.</p>
         </div>
       </div>
     </div>
