@@ -571,7 +571,7 @@
       </div>
     </div>
 
-    <p style="color:var(--text-dim); font-size:14px; margin-top:1rem; margin-bottom:0.5rem;">The code that implements this uses an <strong style="color:var(--text);">enum</strong>. You might think a <code>bool</code> would work -- <code>bool gameOver = false</code> flips to <code>true</code> when you lose. And it does work, for two states. But what happens when you add a pause menu, a high score screen, a level transition? Each new state means another bool, and bools don't tell you what state you're actually in -- just whether one specific condition is true or false. An enum names the states explicitly. You define exactly which values are valid, and the compiler won't let you assign anything else. When you read <code>state == GameState::Playing</code>, it's unambiguous.</p>
+    <p style="color:var(--text-dim); font-size:14px; margin-top:1rem; margin-bottom:0.5rem;">The code that implements this uses an <strong style="color:var(--text);">enum</strong>. A reasonable first approach could be a <code>bool</code> -- <code>bool gameOver = false</code> flips to <code>true</code> when you lose. And it does work, for two states. But what happens when you add a pause menu, a high score screen, a level transition? Each new state means another bool, and bools don't tell you what state you're actually in -- just whether one specific condition is true or false. An enum names the states explicitly. You define exactly which values are valid, and the compiler won't let you assign anything else. When you read <code>state == GameState::Playing</code>, it's unambiguous.</p>
     <p style="color:var(--text-dim); font-size:14px; margin-top:0.5rem; margin-bottom:0.5rem;"><code>enum class</code> is the modern C++ form. The <code>class</code> scopes the values to the enum name -- you write <code>GameState::Playing</code>, not just <code>Playing</code>. That prevents naming collisions as your codebase grows. The enum <strong style="color:var(--text);">definition</strong> goes above <code>main()</code> at file scope -- same rule as structs. The <strong style="color:var(--text);">instance</strong> goes inside <code>main()</code>, above the game loop. How to branch between states is covered when you implement it in step 9.</p>
     <pre style="margin-top:0.5rem;"><code><span class="kw">enum class</span> <span class="type">GameState</span> { Playing, GameOver };  <span class="comment">// definition -- above main()</span>
 
@@ -839,7 +839,7 @@ fallingObjects.<span class="fn">push_back</span>(obj);</code></pre>
     <span class="comment">// runs once per object</span>
 }</code></pre>
       <p style="margin-top:0.4rem;"><code>auto</code> -- the compiler figures out the type automatically from the vector's contents. <code>&amp;</code> -- reference, so changes affect the actual object in the vector, not a copy. <code>:</code> reads as "in."</p>
-      <p style="margin-top:0.6rem;">The vector needs two separate passes -- one in UPDATE, one in DRAW. You might think one loop could handle both: move the object, then draw it, move the next one, draw it. But that means some objects get drawn before they've moved that frame while others get drawn after -- the screen shows objects at inconsistent points in time. Two separate passes guarantee every object is fully updated before any object is drawn:</p>
+      <p style="margin-top:0.6rem;">The vector needs two separate passes -- one in UPDATE, one in DRAW. A natural first approach might be one loop that handles both: move the object, then draw it, move the next one, draw it. But that means some objects get drawn before they've moved that frame while others get drawn after -- the screen shows objects at inconsistent points in time. Two separate passes guarantee every object is fully updated before any object is drawn:</p>
       <pre><code><span class="comment">// UPDATE</span>
 <span class="kw">for</span> (<span class="type">auto</span>&amp; obj : fallingObjects) {
     obj.y += obj.speed * dt;
@@ -867,7 +867,7 @@ fallingObjects.<span class="fn">push_back</span>(obj);</code></pre>
     <!-- CALLOUT FOR STEP 7 -->
     <div class="callout accent" style="margin: 1.25rem 0;">
       <div class="callout-title"><div class="icon icon-blue">→</div> The spawn timer -- creating objects on an interval</div>
-      <p>You want a new object to appear every 1.5 seconds. The instinct might be to pause the program for 1.5 seconds between spawns -- but that would freeze everything: no movement, no drawing, no input. The window would lock up.</p>
+      <p>You want a new object to appear every 1.5 seconds. A reasonable first approach might be to pause the program for 1.5 seconds between spawns -- but that would freeze everything: no movement, no drawing, no input. The window would lock up.</p>
       <p style="margin-top:0.6rem;">The game loop is always running -- 60 times per second. That's the tool you need. Instead of pausing, you count time in the background using delta time. Each frame you add <code>dt</code> to a running total. When that total reaches 1.5 seconds, you spawn an object and reset the counter to zero. The game never stops -- it just checks the clock every frame.</p>
       <p style="margin-top:0.6rem;">Declare these before the game loop:</p>
       <pre><code><span class="type">float</span> spawnTimer = <span class="num">0.0f</span>;     <span class="comment">// time elapsed since last spawn</span>
@@ -901,7 +901,7 @@ fallingObjects.<span class="fn">push_back</span>(obj);</code></pre>
     <!-- CALLOUT FOR STEP 8 -->
     <div class="callout accent" style="margin: 1.25rem 0;">
       <div class="callout-title"><div class="icon icon-blue">→</div> Collision detection with CheckCollisionRecs</div>
-      <p>You want to know if the player has been hit by any falling object. The wrong instinct might be to track positions manually and do the math yourself -- but Raylib has a function that handles this: <code>CheckCollisionRecs()</code>. It takes two <code>Rectangle</code> structs and returns true if they overlap.</p>
+      <p>You want to know if the player has been hit by any falling object. A natural first approach might be to track positions manually and do the math yourself -- but Raylib has a function that handles this: <code>CheckCollisionRecs()</code>. It takes two <code>Rectangle</code> structs and returns true if they overlap.</p>
       <p style="margin-top:0.6rem;"><code>player</code> is already a <code>Rectangle</code>, so it passes directly. Your falling objects store data as individual floats -- construct a <code>Rectangle</code> from those fields inline using the same aggregate initialization syntax used when declaring <code>player</code>:</p>
       <pre><code><span class="type">Rectangle</span> objRect = { obj.x, obj.y, obj.width, obj.height };
 <span class="kw">if</span> (<span class="fn">CheckCollisionRecs</span>(player, objRect)) {
@@ -927,6 +927,7 @@ fallingObjects.<span class="fn">push_back</span>(obj);</code></pre>
         <div class="step-body">
           <strong>Add collision detection <span class="step-badge badge-new">new</span></strong>
           <p style="font-size:13px; color:var(--text-dim); margin-top:0.3rem;">Add <code>bool hit = false;</code> to your variables above the loop. Add the collision loop in UPDATE using the code from the callout above -- place it after the falling objects update block so objects have moved before collisions are checked. In DRAW, replace <code>ClearBackground(BLACK)</code> with:</p>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;"><code>else</code> is the fallback branch -- it runs when the preceding <code>if</code> condition is false. Only one of the two lines runs each frame:</p>
           <pre><code><span class="kw">if</span> (hit) <span class="fn">ClearBackground</span>(RED);
 <span class="kw">else</span> <span class="fn">ClearBackground</span>(BLACK);</code></pre>
           <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;">Compile and confirm the screen flashes red on collision. Step 9 replaces this with proper game state handling.</p>
