@@ -686,7 +686,10 @@
     <span class="fn">CloseWindow</span>();
     <span class="kw">return</span> <span class="num">0</span>;
 }</code></pre>
-          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;">These comments are a map. Each new piece of code you add goes under the comment that names where it belongs.</p>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;">These comments are a map. Each new piece of code you add goes under the comment that names where it belongs -- not above it. The heavy <code>───</code> markers are for the fixed major regions of the program: TYPE DEFINITIONS, VARIABLES, GAME LOOP, UPDATE, DRAW, CLEANUP. Don't add new ones. If you want to group variables within VARIABLES, use a plain inline comment instead:</p>
+          <pre><code><span class="comment">// falling object</span>
+<span class="type">float</span> objX = <span class="num">400.0f</span>;
+<span class="type">float</span> objY = <span class="num">-30.0f</span>;</code></pre>
         </div>
       </div>
     </div>
