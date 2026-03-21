@@ -812,7 +812,10 @@ obj.speed = <span class="num">200.0f</span>;</code></pre>
         <div class="step-num">5</div>
         <div class="step-body">
           <strong>Refactor to struct <span class="step-badge badge-new">new</span></strong>
-          <p style="font-size:13px; color:var(--text-dim); margin-top:0.3rem;">Replace your five <code>obj</code> variables with a single <code>FallingObject</code> struct. Define the struct above <code>main()</code>. Declare one instance before the game loop. Your old loose variables no longer exist -- anywhere your code references them, replace with the equivalent struct fields (<code>objX → obj.x</code>, <code>objY → obj.y</code>, and so on for the rest). Compile and confirm -- behavior should be identical to step 4.</p>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.3rem;">Define the struct above <code>main()</code>. Declare one instance before the game loop. Then delete your five old <code>obj</code> variables from VARIABLES before updating any references -- this is intentional. The compiler will error on every line that still uses the old names:</p>
+          <pre><code><span class="comment">error: 'objY': undeclared identifier</span>
+<span class="comment">error: 'objSpeed': undeclared identifier</span></code></pre>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;">Each error points you at exactly the line that needs updating. Work through them in order, substituting the struct equivalent (<code>objY → obj.y</code>, <code>objSpeed → obj.speed</code>, and so on). When the build is clean, every reference has been updated. This is faster and more reliable than scanning by eye -- you'll use this technique any time you rename or replace something. Compile and confirm behavior is identical to step 4.</p>
         </div>
       </div>
     </div>
