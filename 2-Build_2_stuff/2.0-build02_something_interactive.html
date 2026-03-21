@@ -892,7 +892,7 @@ fallingObjects.<span class="fn">push_back</span>(obj);</code></pre>
         <div class="step-num">7</div>
         <div class="step-body">
           <strong>Add spawn timer <span class="step-badge badge-new">new</span></strong>
-          <p style="font-size:13px; color:var(--text-dim); margin-top:0.3rem;">Remove the manual <code>push_back</code> from before the loop. Add <code>spawnTimer</code> and <code>spawnInterval</code>. In UPDATE, accumulate delta time and spawn a new object at a random x position when the timer fires. Compile and confirm objects spawn on an interval and fall independently.</p>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.3rem;">Remove the entire manual setup block from VARIABLES -- the <code>FallingObject obj</code> declaration, the field assignments, and the <code>push_back</code>. All five lines go. The spawn timer creates its own <code>FallingObject</code> internally each time it fires, so the manual setup is fully replaced, not just the last line of it. Add <code>spawnTimer</code> and <code>spawnInterval</code> in its place. In UPDATE, accumulate delta time and spawn a new object at a random x position when the timer fires. Compile and confirm objects spawn on an interval and fall independently.</p>
           <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;">Note: objects that fall off screen are not yet being removed from the vector -- they just become invisible. For now that's fine, but without removal the vector grows indefinitely. The erase-remove pattern that fixes this is in the companion doc section 02.</p>
         </div>
       </div>
