@@ -580,6 +580,66 @@
   </section>
 
 
+  <!-- FUNCTIONS REFERENCE — collapsed -->
+  <section>
+    <div class="collapsible-header" onclick="toggleSection('funcs')">
+      <h2>Functions introduced in this build</h2>
+      <span class="collapse-toggle" id="funcs-toggle">show</span>
+    </div>
+    <div class="collapsible-body" id="funcs">
+      <p style="font-size:13px; color:var(--text-dim); margin-bottom:0.75rem;">New functions in Build 02. Build 01 functions are in <a href="../raylib_reference.html" style="color:var(--accent);">raylib_reference.html</a>.</p>
+
+      <p style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:600; color:var(--accent); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.4rem; margin-top:0.75rem;">Input</p>
+      <div style="display:flex; flex-direction:column; gap:0.5rem;">
+        <div style="background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem;">
+          <code>IsKeyDown(int key)</code>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.3rem;">Returns <code>true</code> every frame a key is held. Use for continuous actions like movement. Example: <code>IsKeyDown(KEY_LEFT)</code>.</p>
+        </div>
+        <div style="background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem;">
+          <code>IsKeyPressed(int key)</code>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.3rem;">Returns <code>true</code> on the first frame a key goes down -- once per press, not every frame it's held. Use for one-shot actions like restart.</p>
+        </div>
+      </div>
+
+      <p style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:600; color:var(--accent); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.4rem; margin-top:0.75rem;">Shapes</p>
+      <div style="display:flex; flex-direction:column; gap:0.5rem;">
+        <div style="background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem;">
+          <code>DrawRectangle(int x, int y, int w, int h, Color color)</code>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.3rem;">Draws a filled rectangle. All position and size parameters are <code>int</code> -- cast your floats with <code>(int)</code>.</p>
+        </div>
+        <div style="background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem;">
+          <code>DrawRectangleRec(Rectangle rec, Color color)</code>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.3rem;">Draws a filled rectangle from a <code>Rectangle</code> struct. No casts needed -- all fields are already floats.</p>
+        </div>
+        <div style="background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem;">
+          <code>CheckCollisionRecs(Rectangle rec1, Rectangle rec2)</code>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.3rem;">Returns <code>true</code> if two rectangles overlap. Both parameters must be <code>Rectangle</code> structs.</p>
+        </div>
+      </div>
+
+      <p style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:600; color:var(--accent); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.4rem; margin-top:0.75rem;">Text</p>
+      <div style="display:flex; flex-direction:column; gap:0.5rem;">
+        <div style="background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem;">
+          <code>DrawText(const char* text, int x, int y, int fontSize, Color color)</code>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.3rem;">Draws text at a position. The first parameter must be a <code>const char*</code> -- use <code>TextFormat</code> to pass a number as text.</p>
+        </div>
+        <div style="background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem;">
+          <code>TextFormat(const char* fmt, ...)</code>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.3rem;">Formats a string with placeholders and returns <code>const char*</code>. Use <code>%d</code> for int, <code>%f</code> for float. Example: <code>TextFormat("Score: %d", score)</code>.</p>
+        </div>
+      </div>
+
+      <p style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:600; color:var(--accent); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.4rem; margin-top:0.75rem;">Math</p>
+      <div style="display:flex; flex-direction:column; gap:0.5rem;">
+        <div style="background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem;">
+          <code>GetRandomValue(int min, int max)</code>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.3rem;">Returns a random integer between <code>min</code> and <code>max</code>, inclusive.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
   <!-- BUILD IT — open -->
   <section>
     <h2 class="section-label">Build it</h2>
@@ -615,6 +675,7 @@
 
         <span class="comment">// ── DRAW ────────────────────────────────────────────────────────────</span>
         <span class="fn">BeginDrawing</span>();
+            <span class="fn">ClearBackground</span>(BLACK); <span class="comment">// wipe the previous frame -- without this, old frames stack up on screen</span>
             <span class="comment">// -- player</span>
             <span class="comment">// -- falling objects</span>
             <span class="comment">// -- score / UI</span>
@@ -663,8 +724,9 @@ player.height</code></pre>
         new position = current position + (speed * delta time)
       </div>
       <p style="margin-top:0.4rem;">In code, inside an <code>if (IsKeyDown(...))</code> check:</p>
-      <pre><code><span class="kw">if</span> (<span class="fn">IsKeyDown</span>(KEY_LEFT))  player.x -= speed * <span class="fn">GetFrameTime</span>();
-<span class="kw">if</span> (<span class="fn">IsKeyDown</span>(KEY_RIGHT)) player.x += speed * <span class="fn">GetFrameTime</span>();</code></pre>
+      <pre><code><span class="kw">if</span> (<span class="fn">IsKeyDown</span>(KEY_LEFT))  player.x -= speed * dt;
+<span class="kw">if</span> (<span class="fn">IsKeyDown</span>(KEY_RIGHT)) player.x += speed * dt;</code></pre>
+      <p style="margin-top:0.4rem;"><code>dt</code> is the cached <code>GetFrameTime()</code> from the skeleton -- already declared at the start of the game loop. Calling it once and reusing the value is cleaner than calling <code>GetFrameTime()</code> separately in each formula.</p>
       <p style="margin-top:0.4rem;"><code>player.x -= ...</code> is shorthand for <code>player.x = player.x - ...</code> -- same pattern as <code>+=</code> but subtracting. Moving left decreases x; moving right increases it.</p>
       <p style="margin-top:0.4rem;"><code>IsKeyDown</code> returns true every frame a key is held -- movement runs continuously for as long as the key stays down. <code>IsKeyPressed</code> fires once on the first frame a key goes down, then nothing until released and pressed again. Use <code>IsKeyPressed</code> for one-shot actions like restart. Use <code>IsKeyDown</code> for held movement.</p>
       <p style="margin-top:0.4rem;">Declare <code>speed</code> before the game loop:</p>
@@ -702,7 +764,7 @@ player.height</code></pre>
 <span class="type">float</span> objSpeed = <span class="num">200.0f</span>; <span class="comment">// pixels per second</span></code></pre>
       <p style="margin-top:0.4rem;">Starting <code>objY</code> at -30 places the object just above the visible screen area so it appears to fall in from offscreen rather than popping into existence.</p>
       <p style="margin-top:0.6rem;">In UPDATE, move it down each frame:</p>
-      <pre><code>objY += objSpeed * <span class="fn">GetFrameTime</span>();</code></pre>
+      <pre><code>objY += objSpeed * dt;</code></pre>
       <p style="margin-top:0.4rem;">When it passes the bottom of the screen, reset it to the top:</p>
       <pre><code><span class="kw">if</span> (objY &gt; (<span class="type">float</span>)<span class="fn">GetScreenHeight</span>()) objY = <span class="num">-30.0f</span>;</code></pre>
       <p style="margin-top:0.4rem;">In DRAW:</p>
@@ -774,7 +836,7 @@ fallingObjects.<span class="fn">push_back</span>(obj);</code></pre>
       <p style="margin-top:0.6rem;">The vector needs two separate passes -- one in UPDATE, one in DRAW. You might think one loop could handle both: move the object, then draw it, move the next one, draw it. But that means some objects get drawn before they've moved that frame while others get drawn after -- the screen shows objects at inconsistent points in time. Two separate passes guarantee every object is fully updated before any object is drawn:</p>
       <pre><code><span class="comment">// UPDATE</span>
 <span class="kw">for</span> (<span class="type">auto</span>&amp; obj : fallingObjects) {
-    obj.y += obj.speed * <span class="fn">GetFrameTime</span>();
+    obj.y += obj.speed * dt;
     <span class="kw">if</span> (obj.y &gt; (<span class="type">float</span>)<span class="fn">GetScreenHeight</span>()) obj.y = <span class="num">-30.0f</span>;
 }
 
@@ -800,12 +862,12 @@ fallingObjects.<span class="fn">push_back</span>(obj);</code></pre>
     <div class="callout accent" style="margin: 1.25rem 0;">
       <div class="callout-title"><div class="icon icon-blue">→</div> The spawn timer -- creating objects on an interval</div>
       <p>You want a new object to appear every 1.5 seconds. The instinct might be to pause the program for 1.5 seconds between spawns -- but that would freeze everything: no movement, no drawing, no input. The window would lock up.</p>
-      <p style="margin-top:0.6rem;">The game loop is always running -- 60 times per second. That's the tool you need. Instead of pausing, you count time in the background using delta time. Each frame you add <code>GetFrameTime()</code> to a running total. When that total reaches 1.5 seconds, you spawn an object and reset the counter to zero. The game never stops -- it just checks the clock every frame.</p>
+      <p style="margin-top:0.6rem;">The game loop is always running -- 60 times per second. That's the tool you need. Instead of pausing, you count time in the background using delta time. Each frame you add <code>dt</code> to a running total. When that total reaches 1.5 seconds, you spawn an object and reset the counter to zero. The game never stops -- it just checks the clock every frame.</p>
       <p style="margin-top:0.6rem;">Declare these before the game loop:</p>
       <pre><code><span class="type">float</span> spawnTimer = <span class="num">0.0f</span>;     <span class="comment">// time elapsed since last spawn</span>
 <span class="type">float</span> spawnInterval = <span class="num">1.5f</span>;  <span class="comment">// seconds between spawns</span></code></pre>
       <p style="margin-top:0.4rem;">In UPDATE:</p>
-      <pre><code>spawnTimer += <span class="fn">GetFrameTime</span>();
+      <pre><code>spawnTimer += dt;
 <span class="kw">if</span> (spawnTimer &gt;= spawnInterval) {
     spawnTimer = <span class="num">0.0f</span>;
     <span class="type">FallingObject</span> obj;
@@ -847,6 +909,8 @@ fallingObjects.<span class="fn">push_back</span>(obj);</code></pre>
         <span class="kw">break</span>;        <span class="comment">// hit found -- stop checking</span>
     }
 }</code></pre>
+      <p style="margin-top:0.4rem;"><code>hit</code> must be reset to <code>false</code> at the start of each frame's UPDATE block, before the collision loop runs. Without the reset, the first collision latches it permanently to <code>true</code> -- the screen goes red and stays red. This is the state flag pattern: clear the flag before setting it, every frame:</p>
+      <pre><code>hit = <span class="kw">false</span>;   <span class="comment">// top of UPDATE, before collision loop</span></code></pre>
       <p style="margin-top:0.4rem;">Add <code>bool hit = false;</code> to your variables above the loop. Set it to <code>true</code> on collision. In DRAW, check <code>if (hit)</code> to trigger a visible response. <code>GameState::GameOver</code> doesn't exist yet -- that gets wired up in step 9. This goes in UPDATE, after objects have moved. See companion section 01 for the AABB math behind this.</p>
     </div>
 
@@ -894,7 +958,7 @@ fallingObjects.<span class="fn">push_back</span>(obj);</code></pre>
 }</code></pre>
           <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;">Wrap DRAW in an <code>if / else if</code> block. Use <code>DrawText</code> for the game over message (it's in the functions reference above). For restart, check for the R key in your GameOver UPDATE block:</p>
           <pre><code><span class="kw">if</span> (state == <span class="type">GameState</span>::GameOver) {
-    <span class="kw">if</span> (<span class="fn">IsKeyDown</span>(KEY_R)) {
+    <span class="kw">if</span> (<span class="fn">IsKeyPressed</span>(KEY_R)) {
         fallingObjects.<span class="fn">clear</span>();  <span class="comment">// "clear" empties the vector completely</span>
         player.x = <span class="num">350.0f</span>;
         player.y = <span class="num">530.0f</span>;
