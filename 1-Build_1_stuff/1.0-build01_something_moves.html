@@ -654,23 +654,27 @@
         <div class="step-num">3</div>
         <div class="step-body">
           <strong>Make something appear</strong>
-          <span>Draw a circle inside <code>BeginDrawing()</code>. Compile. See it. Now you know the draw pipeline works.</span>
+          <span><code>DrawCircle</code> takes a center position in pixels, a radius, and a color: <code>DrawCircle(400, 300, 25.0f, RED);</code> — put that line inside <code>BeginDrawing()</code>, after <code>ClearBackground</code>. Compile. See it. Now you know the draw pipeline works.</span>
         </div>
       </div>
 
     </div>
 
     <div class="callout accent" style="margin: 1.25rem 0;">
-      <div class="callout-title"><div class="icon icon-blue">→</div> How position variables work</div>
-      <p><code>x</code> and <code>y</code> store the ball's position in pixels from the top-left corner of the window. Initialize them near center as <code>float</code>, along with a radius:</p>
+      <div class="callout-title"><div class="icon icon-blue">→</div> How position, speed, and movement work</div>
+      <p>These are the variables you need before the ball can move:</p>
       <pre><code><span class="type">float</span> x = <span class="num">400.0f</span>;
 <span class="type">float</span> y = <span class="num">300.0f</span>;
-<span class="type">float</span> radius = <span class="num">25.0f</span>;</code></pre>
+<span class="type">float</span> radius = <span class="num">25.0f</span>;
+<span class="type">float</span> speed = <span class="num">200.0f</span>;</code></pre>
       <p style="margin-top:0.6rem;">Use <code>float</code>, not <code>int</code> or <code>double</code>. Position updates involve fractional amounts each frame -- an <code>int</code> would discard those fractions and cause stuttering. <code>double</code> has more precision than needed and doesn't match Raylib's expected types. The <code>f</code> suffix on <code>400.0f</code> tells the compiler these are floats, not doubles.</p>
+      <p style="margin-top:0.6rem;"><strong>Direction and speed are two separate things.</strong> <code>velocityX</code> and <code>velocityY</code> represent <em>direction only</em> -- they're always either <code>1.0f</code> (moving right or down) or <code>-1.0f</code> (moving left or up). <code>speed</code> is the <em>magnitude</em> -- how many pixels per second the ball travels. Keeping them separate matters: when the ball bounces, you only need to flip direction. You don't touch speed at all.</p>
+      <pre><code><span class="type">float</span> velocityX = <span class="num">1.0f</span>;   <span class="comment">// moving right</span>
+<span class="type">float</span> velocityY = <span class="num">1.0f</span>;   <span class="comment">// moving down</span></code></pre>
       <p style="margin-top:0.6rem;"><strong>Updating position each frame.</strong> In the UPDATE section, use <code>+=</code> to advance position:</p>
       <pre><code>x += velocityX * speed * dt;
 y += velocityY * speed * dt;</code></pre>
-      <p><code>x += ...</code> is shorthand for <code>x = x + ...</code> -- same variable, read and updated on the same line.</p>
+      <p><code>x += ...</code> is shorthand for <code>x = x + ...</code> -- same variable, read and updated on the same line. <code>dt</code> is the value from <code>GetFrameTime()</code> -- the time in seconds since the last frame, typically around 0.016 at 60fps. Multiplying by <code>dt</code> means the ball travels the same distance per second regardless of frame rate.</p>
       <p style="margin-top:0.6rem;"><strong>Connecting position to what gets drawn.</strong> Pass <code>x</code> and <code>y</code> to <code>DrawCircle()</code> in the DRAW section:</p>
       <pre><code><span class="fn">DrawCircle</span>((<span class="type">int</span>)x, (<span class="type">int</span>)y, radius, RED);</code></pre>
       <p><code>DrawCircle</code> expects <code>int</code> for its position parameters -- that's Raylib's design. Your variables stay as <code>float</code> for precision; the <code>(int)</code> cast converts them only at the moment of drawing.</p>
@@ -691,10 +695,23 @@ y += velocityY * speed * dt;
         <div class="step-num">4</div>
         <div class="step-body">
           <strong>Make it move</strong>
-          <span>Declare <code>velocityX</code>, <code>velocityY</code>, and <code>speed</code> as floats. Set <code>velocityX</code> and <code>velocityY</code> to <code>1.0f</code> or <code>-1.0f</code> for direction. Use the sequence above to update and draw each frame. Watch the ball slide off screen -- walls come next.</span>
+          <span>Declare all six variables above the loop: <code>x</code>, <code>y</code>, <code>radius</code>, <code>speed</code>, <code>velocityX</code>, and <code>velocityY</code>. Use the update/draw sequence from the callout to move and draw the ball each frame. Watch the ball slide off screen -- walls come next.</span>
         </div>
       </div>
 
+    </div>
+
+    <div class="callout accent" style="margin: 1.25rem 0;">
+      <div class="callout-title"><div class="icon icon-blue">→</div> If statements</div>
+      <p>An <strong>if statement</strong> runs a block of code only when a condition is true. The structure is:</p>
+      <pre><code><span class="kw">if</span> (condition) {
+    <span class="comment">// code that runs when condition is true</span>
+}</code></pre>
+      <p style="margin-top:0.6rem;">For example -- only flip direction when the ball reaches the right edge:</p>
+      <pre><code><span class="kw">if</span> (x + radius &gt;= <span class="fn">GetScreenWidth</span>()) {
+    velocityX *= <span class="num">-1</span>;
+}</code></pre>
+      <p style="margin-top:0.6rem;">The condition is evaluated every frame. When it's false, the block is skipped entirely.</p>
     </div>
 
     <div class="callout accent" style="margin: 1.25rem 0;">
@@ -705,7 +722,7 @@ y += velocityY * speed * dt;
         left or right wall → flip velocityX &nbsp;(velocityX *= -1)<br>
         top or bottom wall → flip velocityY &nbsp;(velocityY *= -1)
       </div>
-      <p>You need four checks -- one per edge. Right edge: <code>x + radius &gt;= GetScreenWidth()</code>. Left edge: <code>x - radius &lt;= 0</code>. Same pattern for top and bottom using <code>y</code> and <code>GetScreenHeight()</code>. Put all four in the UPDATE section.</p>
+      <p>You need four checks -- one per edge. Right edge: <code>x + radius &gt;= GetScreenWidth()</code>. Left edge: <code>x - radius &lt;= 0</code>. Same pattern for top and bottom using <code>y</code> and <code>GetScreenHeight()</code>. Each check is its own if statement. Put all four in the UPDATE section.</p>
     </div>
 
     <div class="step-list" style="margin-top:0;">
@@ -736,7 +753,7 @@ y += velocityY * speed * dt;
     <span class="comment">// your variables go here (position, velocity, etc.)</span>
 
     <span class="kw">while</span> (!<span class="fn">WindowShouldClose</span>()) {
-        <span class="type">float</span> dt = <span class="fn">GetFrameTime</span>();  <span class="comment">// seconds since last frame</span>
+        <span class="type">float</span> dt = <span class="fn">GetFrameTime</span>();  <span class="comment">// seconds since last frame — explained below</span>
 
         <span class="comment">// UPDATE: move things, check collisions</span>
 
@@ -749,6 +766,11 @@ y += velocityY * speed * dt;
     <span class="fn">CloseWindow</span>();
     <span class="kw">return</span> <span class="num">0</span>;
 }</code></pre>
+
+    <div class="callout accent" style="margin: 1.25rem 0;">
+      <div class="callout-title"><div class="icon icon-blue">→</div> Why is GetFrameTime() inside the loop?</div>
+      <p>Because it measures the time since the <em>last</em> frame -- a value that's different every iteration. If you called it once before the loop, you'd get a single measurement taken at startup and use that same stale number forever. Calling it inside the loop at the top of each iteration gives you a fresh value before anything moves.</p>
+    </div>
   </section>
 
 
