@@ -954,8 +954,9 @@ fallingObjects.<span class="fn">push_back</span>(obj);</code></pre>
           <strong>Add game state <span class="step-badge badge-new">new</span></strong>
           <p style="font-size:13px; color:var(--text-dim); margin-top:0.3rem;">The enum <strong style="color:var(--text);">definition</strong> goes above <code>main()</code> at file scope -- same rule as structs:</p>
           <pre><code><span class="kw">enum class</span> <span class="type">GameState</span> { Playing, GameOver };</code></pre>
-          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;">The <strong style="color:var(--text);">instance</strong> goes inside <code>main()</code>, above the game loop:</p>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;">The <strong style="color:var(--text);">instance</strong> goes in the <code>// ─── VARIABLES</code> section, above the game loop, alongside your other variables:</p>
           <pre><code><span class="type">GameState</span> state = <span class="type">GameState</span>::Playing;</code></pre>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;">Declare it once here and nowhere else. If you write <code>GameState state = ...</code> again inside the loop, C++ treats it as a brand new local variable that shadows the outer one -- changes to it won't persist across frames, and the game will silently behave as if state never changes.</p>
           <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;">Wrap all UPDATE logic in a <code>GameState::Playing</code> check -- player movement, clamping, spawn timer, and collision detection all go inside it. Wrapping them means none of it runs when the game is over: the player can't move, objects don't spawn, and collisions aren't checked:</p>
           <pre><code><span class="kw">if</span> (state == <span class="type">GameState</span>::Playing) {
     <span class="comment">// player movement</span>
@@ -977,8 +978,10 @@ fallingObjects.<span class="fn">push_back</span>(obj);</code></pre>
     <span class="fn">DrawText</span>(<span class="str">"Game Over -- press R to restart"</span>, <span class="num">220</span>, <span class="num">260</span>, <span class="num">24</span>, WHITE);
     <span class="comment">// final score display added in step 10</span>
 }</code></pre>
-          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;">In UPDATE, add a GameOver block alongside your Playing block. This is where restart lives -- separate from DRAW, because restarting changes game state:</p>
-          <pre><code><span class="kw">if</span> (state == <span class="type">GameState</span>::GameOver) {
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;">In UPDATE, add the GameOver block as <code>else if</code>, not a separate <code>if</code>. Using a separate <code>if</code> means both blocks could run in the same frame -- on the frame a collision is detected, <code>state</code> flips to <code>GameOver</code> inside the Playing block, then a second <code>if (state == GameState::GameOver)</code> immediately evaluates as true. <code>else if</code> guarantees only one branch runs per frame, same as DRAW:</p>
+          <pre><code><span class="kw">if</span> (state == <span class="type">GameState</span>::Playing) {
+    <span class="comment">// player movement, clamping, spawn timer, falling objects, collision</span>
+} <span class="kw">else if</span> (state == <span class="type">GameState</span>::GameOver) {
     <span class="kw">if</span> (<span class="fn">IsKeyPressed</span>(KEY_R)) {
         fallingObjects.<span class="fn">clear</span>();  <span class="comment">// empties the vector completely</span>
         player.x = <span class="num">350.0f</span>;
@@ -1012,7 +1015,7 @@ fallingObjects.<span class="fn">push_back</span>(obj);</code></pre>
         <div class="step-num">10</div>
         <div class="step-body">
           <strong>Add score <span class="step-badge badge-new">new</span></strong>
-          <p style="font-size:13px; color:var(--text-dim); margin-top:0.3rem;">Declare <code>int score = 0</code> before the loop. Increment it each frame in UPDATE inside <code>GameState::Playing</code>. Display it in DRAW. Add <code>score = 0</code> to your restart block in the GameOver section -- it goes alongside the other resets you added in step 9. Compile and confirm score counts up, displays, and resets correctly.</p>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.3rem;">Declare <code>int score = 0</code> in VARIABLES. Increment it each frame in UPDATE inside <code>GameState::Playing</code>. In DRAW, display the current score inside the Playing branch. Display the final score inside the GameOver branch -- same <code>DrawText(TextFormat(...))</code> call, different position if you want it readable alongside the game over message. Add <code>score = 0</code> to your restart block alongside the other resets from step 9. Compile and confirm score counts up, displays in both states, and resets correctly on restart.</p>
         </div>
       </div>
     </div>
