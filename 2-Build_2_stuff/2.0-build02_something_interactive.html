@@ -957,11 +957,12 @@ fallingObjects.<span class="fn">push_back</span>(obj);</code></pre>
           <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;">The <strong style="color:var(--text);">instance</strong> goes in the <code>// ─── VARIABLES</code> section, above the game loop, alongside your other variables:</p>
           <pre><code><span class="type">GameState</span> state = <span class="type">GameState</span>::Playing;</code></pre>
           <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;">Declare it once here and nowhere else. If you write <code>GameState state = ...</code> again inside the loop, C++ treats it as a brand new local variable that shadows the outer one -- changes to it won't persist across frames, and the game will silently behave as if state never changes.</p>
-          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;">Wrap all UPDATE logic in a <code>GameState::Playing</code> check -- player movement, clamping, spawn timer, and collision detection all go inside it. Wrapping them means none of it runs when the game is over: the player can't move, objects don't spawn, and collisions aren't checked:</p>
+          <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;">Wrap all UPDATE logic in a <code>GameState::Playing</code> check -- player movement, clamping, spawn timer, falling objects, and collision detection all go inside it. Wrapping them means none of it runs when the game is over: the player can't move, objects don't spawn or move, and collisions aren't checked:</p>
           <pre><code><span class="kw">if</span> (state == <span class="type">GameState</span>::Playing) {
     <span class="comment">// player movement</span>
     <span class="comment">// clamping</span>
     <span class="comment">// spawn timer</span>
+    <span class="comment">// falling objects</span>
     <span class="comment">// collision detection -- replace hit = true with: state = GameState::GameOver;</span>
 }</code></pre>
           <p style="font-size:13px; color:var(--text-dim); margin-top:0.4rem;">State handling replaces the temporary collision feedback from step 8. Remove these three things: <code>bool hit</code>, the <code>hit = false</code> reset at the top of UPDATE, and the <code>if (hit) ClearBackground(RED)</code> block in DRAW. None of them are needed once <code>state</code> carries the game-over signal. Restore unconditional <code>ClearBackground(BLACK)</code>.</p>
