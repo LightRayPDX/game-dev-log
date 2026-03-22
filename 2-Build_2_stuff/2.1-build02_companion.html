@@ -664,23 +664,18 @@ fallingObjects.<span class="fn">erase</span>(
     <span class="type">float</span> width = <span class="num">30</span>;
     <span class="type">float</span> height = <span class="num">30</span>;
     <span class="type">float</span> speed;
-    <span class="type">Color</span> color;
 };</code></pre>
         <p>Creating an instance and adding it to a vector:</p>
-        <pre><code><span class="comment">// Construct inline with push_back</span>
-fallingObjects.<span class="fn">push_back</span>({ randomX, <span class="num">-30</span>, <span class="num">30</span>, <span class="num">30</span>, <span class="num">200.0f</span>, RED });
-
-<span class="comment">// Or create a named instance first</span>
+        <pre><code><span class="comment">// Create a named instance, set fields, then push</span>
 <span class="type">FallingObject</span> obj;
 obj.x = randomX;
 obj.y = <span class="num">-30</span>;
 obj.speed = <span class="num">200.0f</span>;
-obj.color = RED;
 fallingObjects.<span class="fn">push_back</span>(obj);</code></pre>
         <p>Accessing fields on objects already in the vector:</p>
         <pre><code><span class="kw">for</span> (<span class="kw">auto</span>&amp; obj : fallingObjects) {
     obj.y += obj.speed * dt; <span class="comment">// move each object down</span>
-    <span class="fn">DrawRectangle</span>((<span class="type">int</span>)obj.x, (<span class="type">int</span>)obj.y, (<span class="type">int</span>)obj.width, (<span class="type">int</span>)obj.height, obj.color);
+    <span class="fn">DrawRectangle</span>((<span class="type">int</span>)obj.x, (<span class="type">int</span>)obj.y, (<span class="type">int</span>)obj.width, (<span class="type">int</span>)obj.height, RED);
 }</code></pre>
 
         <div class="drill">
@@ -724,7 +719,11 @@ spawnTimer += dt;
     spawnTimer = <span class="num">0.0f</span>;
     <span class="comment">// spawn a new object</span>
     <span class="type">float</span> randomX = <span class="fn">GetRandomValue</span>(<span class="num">0</span>, <span class="fn">GetScreenWidth</span>() - <span class="num">30</span>);
-    fallingObjects.<span class="fn">push_back</span>({ (<span class="type">float</span>)randomX, <span class="num">-30</span>, <span class="num">30</span>, <span class="num">30</span>, <span class="num">200.0f</span>, RED });
+    <span class="type">FallingObject</span> obj;
+    obj.x = (<span class="type">float</span>)randomX;
+    obj.y = <span class="num">-30</span>;
+    obj.speed = <span class="num">200.0f</span>;
+    fallingObjects.<span class="fn">push_back</span>(obj);
 }</code></pre>
 
         <div class="drill">
